@@ -40,8 +40,15 @@ with their prefix (for example, any new `_Z_...` folder belongs to Terry).
 
 1. **Always follow best practices** — for C#, for Unity, and for git.
 2. **Keep code well commented.** Everything should be easy to understand for a junior developer.
-   Explain *why* the code does something, not only *what* it does. Give every class and public
-   method a summary comment (`/// <summary>`).
+   Explain *why* the code does something, not only *what* it does.
+   - Give every class and public method a `/// <summary>` comment.
+   - Write comments in **plain text only**. Inside `<summary>`, use no other XML tags
+     (no `<c>`, `<see cref>`, `<para>`, `<list>`, `<code>`, `<param>`, `<returns>`, and so on),
+     and no escaped characters like `&lt;` / `&gt;`. Describe parameters and return values in
+     the summary's own words.
+   - Put long explanations, usage guides, and code examples in a normal `//` comment block
+     above the class, not inside `<summary>`. There, code such as `Singleton<GameManager>`
+     can be written as-is.
 3. **One class per file.** The file name must match the class name (Unity requires this for
    `MonoBehaviour` and `ScriptableObject` classes). The only exception is small helper functions,
    which may share a file with the class they support.
@@ -93,6 +100,6 @@ with their prefix (for example, any new `_Z_...` folder belongs to Terry).
 - [ ] I know who the developer is, and I am calling them by name.
 - [ ] I gave a plan and the developer confirmed it.
 - [ ] Every file I touch is inside the developer's own `_X_` folders.
-- [ ] The code is well commented and uses one class per file.
+- [ ] The code is well commented (plain text, `<summary>` only) and uses one class per file.
 - [ ] I explained any advanced techniques step by step.
 - [ ] Commits go only to the developer's own branch, never `main` or `development`.
