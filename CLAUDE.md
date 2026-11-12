@@ -24,12 +24,13 @@ keep every developer in their own lane. Follow them in every session, without ex
 |-----------|-----|---------------|-------------|----------------------------------------------|
 | Terry     | Z   | `_Z_`         | `Terry`     | `Assets/_Z_GameCore`, `Assets/_Z_HUD`, `Assets/_Z_Menus` |
 | Mia       | M   | `_M_`         | `Mia`       | `Assets/_M_Player`                           |
-| Dylan     | D   | `_D_`         | `Dylan`     | `Assets/_D_Enemy`                            |
+| Dylan     | D   | `_D_`         | `Dylan`     | `Assets/_D_Quests`                           |
 | Sabine    | S   | `_S_`         | `Sabine`    | `Assets/_S_Sheep`                            |
 | Logan     | L   | `_L_`         | `Logan`     | `Assets/_L_Level`                            |
 | JohnPaul  | P   | `_P_`         | `JohnPaul`  | `Assets/_P_Theater`                          |
 | Johnathan | J   | `_J_`         | `Johnathan` | `Assets/_J_Puzzles`                          |
 | Sam       | A   | `_A_`         | `Sam`       | `Assets/_A_Sound`                            |
+| Jibriel   | I   | `_I_`         | `Jibriel`   | `Assets/_I_Enemy`                            |
 
 The "Current folders" column is a snapshot. A developer owns **every** folder whose name starts
 with their prefix (for example, any new `_Z_...` folder belongs to Terry).
