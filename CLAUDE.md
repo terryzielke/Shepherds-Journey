@@ -15,6 +15,50 @@ keep every developer in their own lane. Follow them in every session, without ex
 3. **Call the developer by name** throughout the session, so they can see you know who is working.
 4. Check the current git branch. If it is not the developer's own branch, tell them before doing
    any work.
+5. **Ask which mode to run in.** Once you know who the developer is, ask:
+   > "Which mode should I run in this session? (1) Education Mode (default): I give you code
+   > and explain it, but I never edit files. (2) Workhorse Mode: I can edit your files directly."
+   - If the developer picks a mode, use it. If they don't answer or are unsure, use
+     Education Mode.
+   - Do not read, plan, or change anything until the mode is set (see "Session modes").
+
+---
+
+## Session modes
+
+Every session runs in exactly one of two modes. The mode controls **whether Claude may edit
+files**. It does not relax any other rule in this document: every General rule and Developer
+rule applies in both modes, including the plan-and-confirm rule, the folder rules, the branch
+rules, the comment rules, and the one-class-per-file rule.
+
+### Education Mode (default)
+
+- Claude **never creates, edits, moves, renames, or deletes files**, and never runs commands
+  that do so (no file-writing tools, no shell redirects, no `git commit`, and so on).
+- Claude **may read any file** in the project to understand how systems connect.
+- Claude provides code in the chat, in full or as snippets, and explains what it does and why.
+  Say which file each piece of code belongs in. That file must still be inside the developer's
+  own `_X_` folders, and the code must follow every coding rule in this document.
+- The developer copies the code into their own files.
+- Claude still gives a plan and waits for confirmation before providing the code.
+- Claude still teaches advanced techniques step by step (Developer Rule 4).
+
+### Workhorse Mode
+
+- Claude **may create and edit files directly**, but only inside the current developer's own
+  `_X_` folders (Developer Rule 2 still applies in full).
+- Claude still gives a plan and waits for confirmation before making any edit.
+- Claude still explains advanced techniques step by step (Developer Rule 4).
+- Claude still commits only to the developer's own branch, and only when asked or confirmed
+  (Developer Rule 3).
+
+### Switching modes
+
+- The developer can switch modes at any time by asking.
+- Claude switches only when the developer clearly asks. Claude never switches itself.
+- The mode lasts for the current session only. The next session starts with the question
+  again, and the default is Education Mode.
+- When Claude is unsure which mode is active, it acts as in Education Mode and asks.
 
 ---
 
@@ -58,6 +102,8 @@ with their prefix (for example, any new `_Z_...` folder belongs to Terry).
    - what you will do, step by step;
    - which files you will create or change (all inside the developer's own folders);
    - any integration notes for other developers' code (see Developer Rule 2).
+   - the current mode, and what that means for how the work is delivered (code in chat for
+     Education Mode, direct edits for Workhorse Mode);
 
    If the plan changes while you work, stop and confirm the new plan before continuing.
 
@@ -99,6 +145,8 @@ with their prefix (for example, any new `_Z_...` folder belongs to Terry).
 ## Quick checklist for every task
 
 - [ ] I know who the developer is, and I am calling them by name.
+- [ ] I asked which mode to run in (Education is the default) and I am respecting it.
+- [ ] In Education Mode, I have not edited any files; I only gave code and explanations.
 - [ ] I gave a plan and the developer confirmed it.
 - [ ] Every file I touch is inside the developer's own `_X_` folders.
 - [ ] The code is well commented (plain text, `<summary>` only) and uses one class per file.
