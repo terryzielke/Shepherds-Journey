@@ -1,16 +1,36 @@
-using UnityEngine;
+// IMPORTANT: Unity saves enum fields as their number, not their name.
+// Always add new sheep types at the END of the list, and never reorder or
+// remove existing ones. Otherwise every saved scene and prefab will quietly
+// point at the wrong sheep type.
 
-public class DemoSheepTypes : MonoBehaviour
+/// <summary>
+/// The different kinds of sheep used by the HUD demo. Each value names one
+/// sheep type, so scripts can store and compare sheep types safely.
+/// </summary>
+public enum DemoSheepTypes
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    /// <summary>
+    /// A standard sheep with no special ability. This is the default value.
+    /// </summary>
+    Normal = 0,
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    /// <summary>
+    /// A heavy sheep that weighs more than a normal sheep.
+    /// </summary>
+    Heavy = 1,
+
+    /// <summary>
+    /// A bouncy sheep that springs off surfaces.
+    /// </summary>
+    Bouncy = 2,
+
+    /// <summary>
+    /// A sticky sheep that sticks to surfaces.
+    /// </summary>
+    Sticky = 3,
+
+    /// <summary>
+    /// A projectile sheep that can be launched.
+    /// </summary>
+    Projectile = 4
 }
