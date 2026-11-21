@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 // ---------------------------------------------------------------------------------------------
 // SheepCarrier
@@ -29,8 +30,18 @@ public class SheepCarrier : MonoBehaviour
     [SerializeField] private Transform sheepHolder;
 
     [Header("Input")]
-    [Tooltip("The action that drops the held sheep. Use Player/Interact for now, and switch to Player/DropSheep once the team adds it.")]
-    [SerializeField] private InputActionReference dropAction;
+    [Tooltip("Drops the held sheep, or picks up a nearby one if none is held. Use Player/Interact.")]
+    [SerializeField] private InputActionReference interactAction;
+
+    [Header("Picking Up")]
+    [Tooltip("How close a roaming sheep must be to get picked up, in metres.")]
+    [SerializeField] private float pickupRadius = 2.5f;
+
+    [Tooltip("How high above the player's feet the pickup search is centred, in metres. About waist height, so sheep on small slopes are still found.")]
+    [SerializeField] private float pickupCenterHeight = 1f;
+
+    [Tooltip("Layers to search for sheep. Everything works for now. Once the team adds a Sheep layer, select only that, so the search skips unrelated colliders.")]
+    [SerializeField] private LayerMask sheepLayerMask = ~0;
 
     [Header("Dropping")]
     [Tooltip("How far in front of the player a dropped sheep appears, in metres. Keep it more than the player's radius plus the sheep's radius, so they do not overlap.")]
@@ -42,10 +53,19 @@ public class SheepCarrier : MonoBehaviour
     [Tooltip("Upward speed given to a dropped sheep, in metres per second. Makes it hop off.")]
     [SerializeField] private float dropUpwardSpeed = 2f;
 
+    // The most colliders one pickup search can return.
+    private const int MaxOverlapResults = 32;
+
+    // One array, created once and reused for every pickup search.
+    private readonly Collider[] overlapResults = new Collider[MaxOverlapResults];
     private SheepCarriable heldSheep;
     private SheepCarriable incomingSheep;
     public Transform SheepHolder => sheepHolder;
     public bool IsHoldingSheep => heldSheep != null;
+
+    // The centre of the pickup search: above the player's feet by Pickup Center Height.
+    // Used by both the search and the gizmo, so the drawn circle always matches the real one.
+    private Vector3 PickupCenter => transform.position + Vector3.up * pickupCenterHeight;
 
     /// <summary>
     /// Warns early about a missing Sheep Holder, so the mistake shows up once at the start.
@@ -63,10 +83,10 @@ public class SheepCarrier : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-        if(dropAction == null || dropAction.action == null) return;
+        if(interactAction == null || interactAction.action == null) return;
 
-        dropAction.action.performed += HandleDropPerformed;
-        dropAction.action.Enable();
+        interactAction.action.performed += HandleInteractPerformed;
+        interactAction.action.Enable();
     }
 
     /// <summary>
@@ -74,8 +94,8 @@ public class SheepCarrier : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        if (dropAction == null || dropAction.action == null) return;
-        dropAction.action.performed -= HandleDropPerformed;
+        if (interactAction == null || interactAction.action == null) return;
+        interactAction.action.performed -= HandleInteractPerformed;
     }
 
     /// <summary>
@@ -96,6 +116,54 @@ public class SheepCarrier : MonoBehaviour
 
         incomingSheep = sheep;
         sheep.BeginCarry(this);
+    }
+
+    /// <summary>
+    /// Picks up the nearest roaming sheep within Pickup Radius. Returns true if one was found
+    /// and sent running to the holder, or false if no free sheep was in range.
+    /// </summary>
+    public bool TryPickUpNearbySheep()
+    {
+        // OverlapSphereNonAlloc finds every collider touching an invisible sphere. It writes
+        // them into OUR array and returns how many it found. Only the first "hitCount" slots
+        // hold results from this search. Anything after that is left over from older searches
+        // and must be ignored. QueryTriggerInteraction.Ignore skips trigger zones.
+        int hitCount = Physics.OverlapSphereNonAlloc(
+            PickupCenter, pickupRadius, overlapResults, sheepLayerMask, QueryTriggerInteraction.Ignore);
+
+        SheepCarriable nearestSheep = null;
+        float nearestSqrDistance = float.MaxValue;
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            // The collider is on the sheep's Sphere child, but SheepCarriable is on the root.
+            // GetComponentInParent checks this object first, then walks UP the hierarchy until
+            // it finds one. The ground, the player and so on simply return null.
+            SheepCarriable sheep = overlapResults[i].GetComponentInParent<SheepCarriable>();
+
+            // Skip non-sheep, and sheep that are already running, jumping or riding.
+            if (sheep == null || sheep.IsBeingCarried)
+            {
+                continue;
+            }
+
+            // Squared distance is enough for "which is closest" and skips a square root.
+            float sqrDistance = (sheep.transform.position - transform.position).sqrMagnitude;
+
+            if (sqrDistance < nearestSqrDistance)
+            {
+                nearestSqrDistance = sqrDistance;
+                nearestSheep = sheep;
+            }
+        }
+
+        if (nearestSheep == null)
+        {
+            return false;
+        }
+
+        Carry(nearestSheep);
+        return true;
     }
 
     /// <summary>
@@ -140,10 +208,28 @@ public class SheepCarrier : MonoBehaviour
         incomingSheep = null;
     }
 
-    // Called by the Input System when the drop action is performed. The parameter type must
+    // Called by the Input System when the interact action is performed. The parameter type must
     // match the event: Action<InputAction.CallbackContext>. We do not need its data here.
-    private void HandleDropPerformed(InputAction.CallbackContext context)
+    private void HandleInteractPerformed(InputAction.CallbackContext context)
     {
-        TryDropHeldSheep();
+        if (IsHoldingSheep)
+        {
+            TryDropHeldSheep();
+
+        }
+        else
+        {
+            TryPickUpNearbySheep();
+        }
+    }
+
+    /// <summary>
+    /// Draws the pickup range as a cyan wire sphere in the Scene view when the Player is
+    /// selected, so Pickup Radius can be tuned by eye. Editor only; not seen in the game.
+    /// </summary>
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(PickupCenter, pickupRadius);
     }
 }

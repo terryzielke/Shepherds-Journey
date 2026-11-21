@@ -161,7 +161,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SheepCarrier
   sheepHolder: {fileID: 326476389927693671}
-  dropAction: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  interactAction: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  pickupRadius: 2.5
+  pickupCenterHeight: 1
+  sheepLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
   dropDistance: 1.5
   dropForwardSpeed: 2
   dropUpwardSpeed: 2

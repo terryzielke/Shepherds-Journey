@@ -77,6 +77,7 @@ public class  SheepCarriable : MonoBehaviour
     private bool physicsSuspended;
     private RigidbodyInterpolation savedInterpolation;
     public bool IsAttached { get; private set; }
+    public bool IsBeingCarried => carrier != null;
 
     /// <summary>
     /// Caches the Rigidbody and the solid colliders, and stops the sheep from tipping over
