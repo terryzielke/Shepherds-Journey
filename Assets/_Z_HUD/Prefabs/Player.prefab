@@ -73,7 +73,8 @@ GameObject:
   - component: {fileID: 6466789829940302561}
   - component: {fileID: 7808625688125871037}
   - component: {fileID: 9038079908407523912}
-  - component: {fileID: 3717061434371764402}
+  - component: {fileID: 1821764338119784273}
+  - component: {fileID: 3626740639992913607}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -145,7 +146,7 @@ MonoBehaviour:
   jumpHeight: 1.2
   gravity: -20
   cameraTransform: {fileID: 0}
---- !u!114 &3717061434371764402
+--- !u!114 &1821764338119784273
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -157,7 +158,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddfefc5d4b313654f8fa9bfaec3bbdd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DemoSheepInventory
-  startingCount: 5
+  startingCount: 3
+--- !u!114 &3626740639992913607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4947866214677261090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 784213309df8f694284f31ff67b77ba2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SheepSpawner
+  spawnPoint: {fileID: 5700060138583645563}
+  sheepPrefab: {fileID: 5754159602567946452, guid: 4aca7650e3a1f8849abaf864fa8b4644, type: 3}
 --- !u!1 &7845170696663905324
 GameObject:
   m_ObjectHideFlags: 0

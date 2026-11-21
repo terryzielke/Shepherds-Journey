@@ -1341,11 +1341,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 50, y: 10, z: 1}
   m_Center: {x: 25, y: 0, z: 1}
---- !u!1 &658543590 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4947866214677261090, guid: d53826f79ae1fcd4d8c028cdaf9e92cb, type: 3}
-  m_PrefabInstance: {fileID: 6773312585470722176}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &879632091
 GameObject:
   m_ObjectHideFlags: 0
@@ -2187,19 +2182,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6466789829940302561, guid: d53826f79ae1fcd4d8c028cdaf9e92cb, type: 3}
   m_PrefabInstance: {fileID: 6773312585470722176}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1286559377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 658543590}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddfefc5d4b313654f8fa9bfaec3bbdd4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DemoSheepInventory
-  startingCount: 3
 --- !u!1 &1460089477
 GameObject:
   m_ObjectHideFlags: 0
@@ -2519,7 +2501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e1e5014923e3b24ca2cb2b7dddbe66f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DemoInventoryHUD
-  sheepInventory: {fileID: 1286559377}
+  sheepSpawner: {fileID: 6773312585470722177}
 --- !u!1 &2023013722
 GameObject:
   m_ObjectHideFlags: 0
@@ -3041,15 +3023,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 3717061434371764402, guid: d53826f79ae1fcd4d8c028cdaf9e92cb, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4947866214677261090, guid: d53826f79ae1fcd4d8c028cdaf9e92cb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1286559377}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d53826f79ae1fcd4d8c028cdaf9e92cb, type: 3}
+--- !u!114 &6773312585470722177 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3626740639992913607, guid: d53826f79ae1fcd4d8c028cdaf9e92cb, type: 3}
+  m_PrefabInstance: {fileID: 6773312585470722176}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 784213309df8f694284f31ff67b77ba2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SheepSpawner
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

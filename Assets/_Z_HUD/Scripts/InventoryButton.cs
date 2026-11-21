@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// SheepTypeButton
+// InventoryButton
 // -------------------
 // Connects one UI Button to one sheep type. It does two jobs:
 //   1. When clicked, it tells the InventoryHUD which sheep type it stands for.
@@ -12,30 +12,14 @@ using UnityEngine.UI;
 // Why a script instead of the OnClick list in the Inspector?
 // The Inspector's OnClick list can only pass simple values (int, float,
 // string, bool, or an Object). It cannot pass an enum like SheepTypes.
-//
-// How the count stays up to date:
-// The button subscribes to SheepInventroy.SheepCountChanged. The event
-// fires for every sheep type, so each button checks whether the change is for
-// its own type and ignores the rest. The event only fires on a change, so the
-// button also reads its starting count once in Start.
-//
-// Setup:
-//   1. Add this component to a Button GameObject.
-//   2. Pick the button's sheep type from the Sheep Type dropdown.
-//   3. Drag the button's CountText child into Count Text.
-//   4. (Optional) Drag the InventoryHUD object into Inventory HUD. If you leave
-//      it empty, the script finds the InventoryHUD on a parent object.
-//   5. Do NOT also add an entry to the Button's OnClick list, or clicks run twice.
 
 /// <summary>
 /// Links a UI Button to one sheep type. Sends its sheep type to the
 /// InventoryHUD when clicked, shows how many of that sheep the player
 /// has, and becomes unclickable when the player has none left.
 /// </summary>
-// RequireComponent guarantees a Button is on this GameObject, so
-// GetComponent<Button>() below never returns null.
 [RequireComponent(typeof(Button))]
-public class SheepTypeButton : MonoBehaviour
+public class InventoryButton : MonoBehaviour
 {
     [Tooltip("The sheep type this button selects.")]
     [SerializeField] private SheepTypes sheepType = SheepTypes.Normal;
@@ -50,7 +34,7 @@ public class SheepTypeButton : MonoBehaviour
     private Button button;
 
     // The player's sheep inventory, taken from the HUD in Awake.
-    private SheepInventroy inventory;
+    private SheepInventory inventory;
 
     // Becomes true once Start has run. Used by OnEnable to know whether it is
     // safe to read the inventory yet (see the timing notes in OnEnable).
@@ -74,7 +58,7 @@ public class SheepTypeButton : MonoBehaviour
 
         if (inventoryHUD == null)
         {
-            Debug.LogWarning($"[SheepTypeButton] No InventoryHUD found for {name}. " +
+            Debug.LogWarning($"[InventoryButton] No InventoryHUD found for {name}. " +
                              "Assign one in the Inspector or place this button under InventoryHUD.", this);
             return;
         }
@@ -85,7 +69,7 @@ public class SheepTypeButton : MonoBehaviour
 
         if (countText == null)
         {
-            Debug.LogWarning($"[SheepTypeButton] Count Text is not assigned on {name}.", this);
+            Debug.LogWarning($"[InventoryButton] Count Text is not assigned on {name}.", this);
         }
     }
 
@@ -155,7 +139,7 @@ public class SheepTypeButton : MonoBehaviour
         inventoryHUD.SelectSheepType(sheepType);
     }
 
-    // Called by SheepInventroy whenever ANY sheep count changes.
+    // Called by SheepInventory whenever ANY sheep count changes.
     // The parameters must match the event's type: Action<SheepTypes, int>.
     private void HandleSheepCountChanged(SheepTypes changedSheepType, int newCount)
     {

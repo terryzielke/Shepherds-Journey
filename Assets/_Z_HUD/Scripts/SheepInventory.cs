@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-// SheepInventroy
+// SheepInventory
 // ------------------
 // Keeps track of how many of each sheep type the player is carrying.
 //
@@ -20,7 +20,7 @@ using UnityEngine;
 //
 // Listening for changes (example for another script, such as a HUD):
 //
-//     [SerializeField] private SheepInventroy inventory;
+//     [SerializeField] private SheepInventory inventory;
 //
 //     private void OnEnable()  { inventory.SheepCountChanged += HandleSheepCountChanged; }
 //     private void OnDisable() { inventory.SheepCountChanged -= HandleSheepCountChanged; }
@@ -40,7 +40,7 @@ using UnityEngine;
 /// and remove sheep through the public methods, and can listen to the
 /// SheepCountChanged event to find out when a count changes.
 /// </summary>
-public class SheepInventroy : MonoBehaviour
+public class SheepInventory : MonoBehaviour
 {
     [Tooltip("How many of each sheep type the player starts with.")]
     // Min(0) stops the Inspector from accepting a negative starting count.
@@ -105,7 +105,7 @@ public class SheepInventroy : MonoBehaviour
     {
         if (amount <= 0)
         {
-            Debug.LogWarning($"[SheepInventroy] AddSheep needs a positive amount, got {amount}.", this);
+            Debug.LogWarning($"[SheepInventory] AddSheep needs a positive amount, got {amount}.", this);
             return;
         }
 
@@ -121,7 +121,7 @@ public class SheepInventroy : MonoBehaviour
     {
         if (amount <= 0)
         {
-            Debug.LogWarning($"[SheepInventroy] TryRemoveSheep needs a positive amount, got {amount}.", this);
+            Debug.LogWarning($"[SheepInventory] TryRemoveSheep needs a positive amount, got {amount}.", this);
             return false;
         }
 
@@ -131,7 +131,7 @@ public class SheepInventroy : MonoBehaviour
         // decide what to do (for example, show "out of sheep" in the HUD).
         if (currentCount < amount)
         {
-            Debug.Log($"[SheepInventroy] Not enough {sheepType} sheep: have {currentCount}, need {amount}.", this);
+            Debug.Log($"[SheepInventory] Not enough {sheepType} sheep: have {currentCount}, need {amount}.", this);
             return false;
         }
 
@@ -146,7 +146,7 @@ public class SheepInventroy : MonoBehaviour
     {
         sheepCounts[ToIndex(sheepType)] = newCount;
 
-        Debug.Log($"[SheepInventroy] {sheepType} sheep: {newCount}", this);
+        Debug.Log($"[SheepInventory] {sheepType} sheep: {newCount}", this);
 
         // The ?. means "only call Invoke if at least one script is listening".
         // Without it, raising an event with no listeners would throw a

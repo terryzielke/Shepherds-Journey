@@ -15,7 +15,7 @@ using UnityEngine;
 // Setup:
 //   - Add this component to the InventoryHUD GameObject in the scene.
 //   - Drag the scene's Player object into Sheep Inventory.
-//   - The sheep buttons (SheepTypeButton) call SelectSheepType when clicked.
+//   - The sheep buttons (InventoryButton) call SelectSheepType when clicked.
 
 /// <summary>
 /// Keeps track of which sheep type is selected in the demo inventory HUD,
@@ -24,8 +24,8 @@ using UnityEngine;
 /// </summary>
 public class InventoryHUD : MonoBehaviour
 {
-    [Tooltip("The player's sheep inventory. Drag the Player object from the scene here.")]
-    [SerializeField] private SheepInventroy sheepInventory;
+    [Tooltip("The player's sheep spawner. Drag the Player object from the scene here.")]
+    [SerializeField] private SheepSpawner sheepSpawner;
 
     // The sheep type that is currently selected. Private so that other scripts
     // cannot change it directly; they must go through SelectSheepType, which
@@ -33,10 +33,10 @@ public class InventoryHUD : MonoBehaviour
     private SheepTypes selectedSheepType = SheepTypes.Normal;
 
     /// <summary>
-    /// The player's sheep inventory that this HUD displays. Can be null if it
-    /// was not assigned in the Inspector.
+    /// The player's sheep inventory that this HUD displays, taken from the
+    /// spawner. Is null if the spawner was not assigned in the Inspector.
     /// </summary>
-    public SheepInventroy Inventory => sheepInventory;
+    public SheepInventory Inventory => sheepSpawner != null ? sheepSpawner.Inventory : null;
 
     /// <summary>
     /// The sheep type that is currently selected. Other scripts can read this
@@ -50,10 +50,10 @@ public class InventoryHUD : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        if (sheepInventory == null)
+        if (sheepSpawner == null)
         {
-            Debug.LogWarning("[InventoryHUD] Sheep Inventory is not assigned. " +
-                             "Drag the Player object into the Sheep Inventory field.", this);
+            Debug.LogWarning("[InventoryHUD] Sheep Spawner is not assigned. " +
+                             "Drag the Player object into the Sheep Spawner field.", this);
         }
     }
 
@@ -64,15 +64,16 @@ public class InventoryHUD : MonoBehaviour
     public void SelectSheepType(SheepTypes sheepType)
     {
         selectedSheepType = sheepType;
-        // Spawn a the sheep of the selected type
         SpawnSheep(selectedSheepType);
     }
 
     public void SpawnSheep(SheepTypes sheepType)
     {
-        // Passing "this" as the second argument makes the log message
-        // clickable in the Console: clicking it highlights this GameObject
-        // in the Hierarchy, which helps when tracking down where a log came from.
-        Debug.Log($"[InventoryHUD] Selected sheep type: {selectedSheepType}", this);
+        if (sheepSpawner == null) return;
+
+        if (sheepSpawner.TrySpawnSheep(sheepType))
+        {
+            Debug.Log($"[InventoryHUD] Spawned a {sheepType} sheep.", this);
+        }
     }
 }
