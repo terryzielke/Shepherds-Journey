@@ -1,13 +1,13 @@
 using System;
 using UnityEngine;
 
-// DemoSheepInventory
+// SheepInventroy
 // ------------------
 // Keeps track of how many of each sheep type the player is carrying.
 //
 // How the counts are stored:
 // One int per sheep type, kept in an array. The enum value is used as the
-// array index, because every DemoSheepTypes value is a number underneath:
+// array index, because every SheepTypes value is a number underneath:
 //
 //     sheepCounts[0] -> Normal
 //     sheepCounts[1] -> Heavy
@@ -16,16 +16,16 @@ using UnityEngine;
 //     sheepCounts[4] -> Projectile
 //
 // The array size is read from the enum itself, so adding a new sheep type to
-// DemoSheepTypes automatically gives it a slot here.
+// SheepTypes automatically gives it a slot here.
 //
 // Listening for changes (example for another script, such as a HUD):
 //
-//     [SerializeField] private DemoSheepInventory inventory;
+//     [SerializeField] private SheepInventroy inventory;
 //
 //     private void OnEnable()  { inventory.SheepCountChanged += HandleSheepCountChanged; }
 //     private void OnDisable() { inventory.SheepCountChanged -= HandleSheepCountChanged; }
 //
-//     private void HandleSheepCountChanged(DemoSheepTypes sheepType, int newCount)
+//     private void HandleSheepCountChanged(SheepTypes sheepType, int newCount)
 //     {
 //         // Update the number shown for this sheep type.
 //     }
@@ -40,18 +40,18 @@ using UnityEngine;
 /// and remove sheep through the public methods, and can listen to the
 /// SheepCountChanged event to find out when a count changes.
 /// </summary>
-public class DemoSheepInventory : MonoBehaviour
+public class SheepInventroy : MonoBehaviour
 {
     [Tooltip("How many of each sheep type the player starts with.")]
     // Min(0) stops the Inspector from accepting a negative starting count.
     [Min(0)]
-    [SerializeField] private int startingCount = 5;
+    [SerializeField] private int startingCount = 3;
 
     /// <summary>
     /// Raised whenever the count of a sheep type changes. Listeners receive the
     /// sheep type that changed and its new count.
     /// </summary>
-    public event Action<DemoSheepTypes, int> SheepCountChanged;
+    public event Action<SheepTypes, int> SheepCountChanged;
 
     // One count per sheep type, indexed by the enum's number.
     // Private so the only way to change a count is through the methods below,
@@ -65,9 +65,9 @@ public class DemoSheepInventory : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        // Enum.GetValues returns every value in DemoSheepTypes, so Length is
+        // Enum.GetValues returns every value in SheepTypes, so Length is
         // the number of sheep types (5 right now).
-        int sheepTypeCount = Enum.GetValues(typeof(DemoSheepTypes)).Length;
+        int sheepTypeCount = Enum.GetValues(typeof(SheepTypes)).Length;
         sheepCounts = new int[sheepTypeCount];
 
         for (int i = 0; i < sheepCounts.Length; i++)
@@ -84,7 +84,7 @@ public class DemoSheepInventory : MonoBehaviour
     /// <summary>
     /// Returns how many sheep of the given type the player has.
     /// </summary>
-    public int GetCount(DemoSheepTypes sheepType)
+    public int GetCount(SheepTypes sheepType)
     {
         return sheepCounts[ToIndex(sheepType)];
     }
@@ -92,7 +92,7 @@ public class DemoSheepInventory : MonoBehaviour
     /// <summary>
     /// Returns true if the player has at least one sheep of the given type.
     /// </summary>
-    public bool HasSheep(DemoSheepTypes sheepType)
+    public bool HasSheep(SheepTypes sheepType)
     {
         return GetCount(sheepType) > 0;
     }
@@ -101,11 +101,11 @@ public class DemoSheepInventory : MonoBehaviour
     /// Adds the given number of sheep of one type to the inventory. The amount
     /// must be greater than zero; to take sheep away, use TryRemoveSheep.
     /// </summary>
-    public void AddSheep(DemoSheepTypes sheepType, int amount = 1)
+    public void AddSheep(SheepTypes sheepType, int amount = 1)
     {
         if (amount <= 0)
         {
-            Debug.LogWarning($"[DemoSheepInventory] AddSheep needs a positive amount, got {amount}.", this);
+            Debug.LogWarning($"[SheepInventroy] AddSheep needs a positive amount, got {amount}.", this);
             return;
         }
 
@@ -117,11 +117,11 @@ public class DemoSheepInventory : MonoBehaviour
     /// has enough. Returns true if the sheep were removed, or false (and
     /// changes nothing) if there were not enough.
     /// </summary>
-    public bool TryRemoveSheep(DemoSheepTypes sheepType, int amount = 1)
+    public bool TryRemoveSheep(SheepTypes sheepType, int amount = 1)
     {
         if (amount <= 0)
         {
-            Debug.LogWarning($"[DemoSheepInventory] TryRemoveSheep needs a positive amount, got {amount}.", this);
+            Debug.LogWarning($"[SheepInventroy] TryRemoveSheep needs a positive amount, got {amount}.", this);
             return false;
         }
 
@@ -131,7 +131,7 @@ public class DemoSheepInventory : MonoBehaviour
         // decide what to do (for example, show "out of sheep" in the HUD).
         if (currentCount < amount)
         {
-            Debug.Log($"[DemoSheepInventory] Not enough {sheepType} sheep: have {currentCount}, need {amount}.", this);
+            Debug.Log($"[SheepInventroy] Not enough {sheepType} sheep: have {currentCount}, need {amount}.", this);
             return false;
         }
 
@@ -142,11 +142,11 @@ public class DemoSheepInventory : MonoBehaviour
     // The single place where a count actually changes. Both AddSheep and
     // TryRemoveSheep go through here, so the log and the event can never be
     // forgotten in one of them.
-    private void SetCount(DemoSheepTypes sheepType, int newCount)
+    private void SetCount(SheepTypes sheepType, int newCount)
     {
         sheepCounts[ToIndex(sheepType)] = newCount;
 
-        Debug.Log($"[DemoSheepInventory] {sheepType} sheep: {newCount}", this);
+        Debug.Log($"[SheepInventroy] {sheepType} sheep: {newCount}", this);
 
         // The ?. means "only call Invoke if at least one script is listening".
         // Without it, raising an event with no listeners would throw a
@@ -156,16 +156,16 @@ public class DemoSheepInventory : MonoBehaviour
 
     // Turns a sheep type into its array index. Normally that is just the
     // enum's number, but C# allows casting any int to an enum, for example
-    // (DemoSheepTypes)99. This check turns that mistake into a clear error
+    // (SheepTypes)99. This check turns that mistake into a clear error
     // message instead of a confusing IndexOutOfRangeException.
-    private int ToIndex(DemoSheepTypes sheepType)
+    private int ToIndex(SheepTypes sheepType)
     {
         int index = (int)sheepType;
 
         if (index < 0 || index >= sheepCounts.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(sheepType), sheepType,
-                "Unknown sheep type. Was a value added to DemoSheepTypes without a number?");
+                "Unknown sheep type. Was a value added to SheepTypes without a number?");
         }
 
         return index;
@@ -176,6 +176,6 @@ public class DemoSheepInventory : MonoBehaviour
     [ContextMenu("Test Remove One Heavy")]
     private void TestRemoveOneHeavy()
     {
-        TryRemoveSheep(DemoSheepTypes.Heavy);
+        TryRemoveSheep(SheepTypes.Heavy);
     }
 }

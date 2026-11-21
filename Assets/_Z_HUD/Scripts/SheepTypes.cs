@@ -4,10 +4,10 @@
 // point at the wrong sheep type.
 
 /// <summary>
-/// The different kinds of sheep used by the HUD demo. Each value names one
+/// The different kinds of sheep used by the HUD. Each value names one
 /// sheep type, so scripts can store and compare sheep types safely.
 /// </summary>
-public enum DemoSheepTypes
+public enum SheepTypes
 {
     /// <summary>
     /// A standard sheep with no special ability. This is the default value.
