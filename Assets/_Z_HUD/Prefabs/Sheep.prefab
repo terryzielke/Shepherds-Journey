@@ -124,6 +124,7 @@ GameObject:
   - component: {fileID: 5754159602567946452}
   - component: {fileID: -8402803447480961763}
   - component: {fileID: 1090662470056501161}
+  - component: {fileID: 8279131137210270480}
   m_Layer: 0
   m_Name: Sheep
   m_TagString: Untagged
@@ -211,3 +212,26 @@ MonoBehaviour:
   maxIdleTime: 4
   arriveDistance: 0.3
   maxWanderTime: 8
+--- !u!114 &8279131137210270480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1695160496159774530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c10c366b078f8b54f816502dc8be3b13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SheepCariable
+  behavioursToDisable:
+  - {fileID: 1090662470056501161}
+  runSpeed: 10
+  acceleration: 25
+  turnSpeed: 720
+  sidePointDistance: 2
+  landingSpotDistance: 2
+  pointReachedDistance: 0.5
+  maxRunTime: 6
+  jumpDuration: 0.5
+  jumpHeight: 1.5

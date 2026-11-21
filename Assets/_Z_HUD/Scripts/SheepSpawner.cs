@@ -35,6 +35,7 @@ using UnityEngine;
 /// player has none left.
 /// </summary>
 [RequireComponent(typeof(SheepInventory))]
+[RequireComponent(typeof(SheepCarrier))]
 public class SheepSpawner : MonoBehaviour
 {
     [Header("Spawn Position")]
@@ -57,8 +58,8 @@ public class SheepSpawner : MonoBehaviour
     [Tooltip("The Sheep prefab to spawn. Its type is set after it is created.")]
     [SerializeField] private SheepSelectType sheepPrefab;
 
-    // The inventory on this same GameObject. Found on first use (see Inventory).
     private SheepInventory inventory;
+    private SheepCarrier carrier;
 
     /// <summary>
     /// The player's sheep inventory, on the same GameObject as this spawner.
@@ -84,7 +85,9 @@ public class SheepSpawner : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        if(spawnCamera == null)
+        carrier = GetComponent<SheepCarrier>();
+
+        if (spawnCamera == null)
         {
             spawnCamera = Camera.main;
         }
@@ -130,7 +133,20 @@ public class SheepSpawner : MonoBehaviour
         newSheep.SetSheepType(sheepType);
 
         // Rename the sheep so it is clear in the Hierarchy what type it is
-        newSheep.name = $"Sheep ({sheepType})";
+        newSheep.name = $"{sheepType} Sheep";
+
+        // Hand the new sheep to the carrier, which sends it running to the SheepHolder.
+        // Instantiate has already run the sheep's Awake, so it is ready for this call.
+        // TryGetComponent returns false instead of throwing if the prefab has no
+        // SheepCarriable, so a setup mistake gives a warning and the sheep still spawns.
+        if(newSheep.TryGetComponent(out SheepCarriable carriable))
+        {
+            carrier.Carry(carriable);
+        }
+        else
+        {
+            Debug.LogWarning($"[SheepSpawner] The sheep prefab {sheepPrefab.name} has no SheepCarriable component. Drag the SheepCarriable script onto the prefab so it can be carried.", newSheep);
+        }
 
         return true;
     }

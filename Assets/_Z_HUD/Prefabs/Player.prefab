@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 4178589223086154509}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 9038079908407523912}
   - component: {fileID: 1821764338119784273}
   - component: {fileID: 3626740639992913607}
+  - component: {fileID: 5437556380602300781}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -147,6 +148,23 @@ MonoBehaviour:
   raycastStartHeight: 10
   raycastLength: 50
   sheepPrefab: {fileID: 5754159602567946452, guid: 4aca7650e3a1f8849abaf864fa8b4644, type: 3}
+--- !u!114 &5437556380602300781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4947866214677261090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5f55401622e6274b815486fa3ec36a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SheepCarrier
+  sheepHolder: {fileID: 326476389927693671}
+  dropAction: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  dropDistance: 1.5
+  dropForwardSpeed: 2
+  dropUpwardSpeed: 2
 --- !u!1 &7845170696663905324
 GameObject:
   m_ObjectHideFlags: 0
