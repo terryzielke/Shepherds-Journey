@@ -2008,6 +2008,7 @@ GameObject:
   - component: {fileID: 1107660700}
   - component: {fileID: 1107660699}
   - component: {fileID: 1107660698}
+  - component: {fileID: 1107660701}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -2099,6 +2100,18 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!225 &1107660701
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107660696}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1248131823
 GameObject:
   m_ObjectHideFlags: 0
@@ -2546,6 +2559,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2019493643}
   - component: {fileID: 2019493644}
+  - component: {fileID: 2019493645}
   m_Layer: 0
   m_Name: InventoryHUD
   m_TagString: Untagged
@@ -2582,6 +2596,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DemoInventoryHUD
   sheepSpawner: {fileID: 6773312585470722177}
+--- !u!114 &2019493645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2019493642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d184f4458acb87341b62bae05cdbf60a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryToggle
+  showAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Show Inventory
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: d91b5b96-a3d6-4aad-9c09-f6ef0feeab93
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 639a45fd-a5b1-4603-b6c7-181ef57914e8
+        m_Path: <Keyboard>/alt
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Show Inventory
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  canvasGroup: {fileID: 0}
 --- !u!1 &2023013722
 GameObject:
   m_ObjectHideFlags: 0
