@@ -8,28 +8,28 @@ keep every developer in their own lane. Follow them in every session, without ex
 
 ## Start of every session (do this before anything else)
 
-1. **Find out who the developer is.** Before reading, planning, or changing anything, ask:
-   > "Before we start, who am I working with? Please enter your name or letter tag."
-2. Match the answer to the table below. If it doesn't match anyone, ask again. Do not continue
-   until you know who the developer is.
-3. **Call the developer by name** throughout the session, so they can see you know who is working.
-4. Check the current git branch. If it is not the developer's own branch, tell them before doing
-   any work.
-5. **Ask which mode to run in.** Once you know who the developer is, ask:
-   > "Which mode should I run in this session? (1) Education Mode (default): I give you code
-   > and explain it, but I never edit files. (2) Workhorse Mode: I can edit your files directly."
-   - If the developer picks a mode, use it. If they don't answer or are unsure, use
-     Education Mode.
-   - Do not read, plan, or change anything until the mode is set (see "Session modes").
+1. **Verify the Git branch.** Check the current Git branch immediately. If the user is on
+   `main` or `development`, stop and warn them before reading, planning, or changing anything.
+   Do not proceed until they switch to a valid feature or personal branch.
+2. **Ask for the root folder.** Before reading, planning, or changing anything, ask:
+   > "Before we start, which root folder under `Assets/` are we working in? (Must start with an
+   > underscore, e.g., `Assets/_Player`)"
+   - Verify that the folder path starts with `Assets/_` (an underscore directly under `Assets`).
+   - Do not continue until a valid root folder is confirmed.
+3. **Default to Education Mode.** Start every session in **Education Mode** automatically. Do
+   not ask which mode to run in. Switch to **Workhorse Mode** only if the user explicitly
+   instructs you to do so.
+   - If the user instructs you to run in **Workhorse Mode**, immediately ask which exact file(s)
+     you are permitted to work in before making any plans or edits.
 
 ---
 
 ## Session modes
 
 Every session runs in exactly one of two modes. The mode controls **whether Claude may edit
-files**. It does not relax any other rule in this document: every General rule and Developer
-rule applies in both modes, including the plan-and-confirm rule, the folder rules, the branch
-rules, the comment rules, and the one-class-per-file rule.
+files**. It does not relax any other rule in this document: every General rule and Boundary
+rule applies in both modes, including the plan-and-confirm rule, the root folder rules, the
+branch rules, the comment rules, and the one-class-per-file rule.
 
 ### Education Mode (default)
 
@@ -37,47 +37,31 @@ rules, the comment rules, and the one-class-per-file rule.
   that do so (no file-writing tools, no shell redirects, no `git commit`, and so on).
 - Claude **may read any file** in the project to understand how systems connect.
 - Claude provides code in the chat, in full or as snippets, and explains what it does and why.
-  Say which file each piece of code belongs in. That file must still be inside the developer's
-  own `_X_` folders, and the code must follow every coding rule in this document.
+  Say which file each piece of code belongs in. That file must still be inside the active
+  `Assets/_...` root folder, and the code must follow every coding rule in this document.
 - The developer copies the code into their own files.
 - Claude still gives a plan and waits for confirmation before providing the code.
-- Claude still teaches advanced techniques step by step (Developer Rule 4).
+- Claude still teaches advanced techniques step by step (Boundary Rule 4).
 
-### Workhorse Mode
+### Workhorse Mode (explicit opt-in only)
 
-- Claude **may create and edit files directly**, but only inside the current developer's own
-  `_X_` folders (Developer Rule 2 still applies in full).
+- Activated **only** when the user explicitly instructs Claude to run in Workhorse Mode.
+- Requires the user to specify the **exact file(s)** to work in. Claude **may only create or
+  edit those exact specified files** (which must also reside inside the active `Assets/_...`
+  root folder). Claude will not touch, create, or modify any additional files.
 - Claude still gives a plan and waits for confirmation before making any edit.
-- Claude still explains advanced techniques step by step (Developer Rule 4).
-- Claude still commits only to the developer's own branch, and only when asked or confirmed
-  (Developer Rule 3).
+- Claude still explains advanced techniques step by step (Boundary Rule 4).
+- Claude still commits only to the user's active non-protected branch, and only when asked or
+  confirmed (Boundary Rule 3).
 
 ### Switching modes
 
-- The developer can switch modes at any time by asking.
-- Claude switches only when the developer clearly asks. Claude never switches itself.
-- The mode lasts for the current session only. The next session starts with the question
-  again, and the default is Education Mode.
-- When Claude is unsure which mode is active, it acts as in Education Mode and asks.
-
----
-
-## Developers
-
-| Developer | Tag | Folder prefix | Git branch  | Current folders                              |
-|-----------|-----|---------------|-------------|----------------------------------------------|
-| Terry     | Z   | `_Z_`         | `Terry`     | `Assets/_Z_GameCore`, `Assets/_Z_HUD`, `Assets/_Z_Menus` |
-| Mia       | M   | `_M_`         | `Mia`       | `Assets/_M_Player`                           |
-| Dylan     | D   | `_D_`         | `Dylan`     | `Assets/_D_Quests`                           |
-| Sabine    | S   | `_S_`         | `Sabine`    | `Assets/_S_Sheep`                            |
-| Logan     | L   | `_L_`         | `Logan`     | `Assets/_L_Level`                            |
-| JohnPaul  | P   | `_P_`         | `JohnPaul`  | `Assets/_P_Theater`                          |
-| Johnathan | J   | `_J_`         | `Johnathan` | `Assets/_J_Puzzles`                          |
-| Sam       | A   | `_A_`         | `Sam`       | `Assets/_A_Sound`                            |
-| Jibriel   | I   | `_I_`         | `Jibriel`   | `Assets/_I_Enemy`                            |
-
-The "Current folders" column is a snapshot. A developer owns **every** folder whose name starts
-with their prefix (for example, any new `_Z_...` folder belongs to Terry).
+- The session always starts in **Education Mode** without asking.
+- The user can switch to **Workhorse Mode** (or back to Education Mode) at any time by explicitly
+  asking. Claude never switches to Workhorse Mode on its own.
+- Whenever switching into Workhorse Mode, Claude must ask the user to name the exact file(s) it
+  is allowed to work in before proceeding.
+- The mode and authorized file list last for the current session only.
 
 ---
 
@@ -100,39 +84,44 @@ with their prefix (for example, any new `_Z_...` folder belongs to Terry).
 4. **Plan first, then wait for confirmation.** When asked to do a task, ALWAYS give a plan first
    and get the developer's confirmation before starting any work. The plan should list:
    - what you will do, step by step;
-   - which files you will create or change (all inside the developer's own folders);
-   - any integration notes for other developers' code (see Developer Rule 2).
+   - which files you will create or change (all inside the confirmed `Assets/_...` root folder,
+     and restricted strictly to the explicitly named files if in Workhorse Mode);
+   - any integration notes for code outside the active root folder (see Boundary Rule 2);
    - the current mode, and what that means for how the work is delivered (code in chat for
-     Education Mode, direct edits for Workhorse Mode);
+     Education Mode, direct edits to specified files only for Workhorse Mode).
 
    If the plan changes while you work, stop and confirm the new plan before continuing.
 
 ---
 
-## Developer rules
+## Boundary & Git rules
 
-1. **Know who you are working with.** Before doing ANYTHING in a session, make sure you know who
-   the developer is (see "Start of every session"). Call them by name while you work.
+1. **Stay strictly inside the confirmed root folder.**
+   - All work must stay inside the specific `Assets/_...` root folder confirmed at the start of
+     the session (for example, `Assets/_Player`).
+   - **NEVER work in any folder outside the confirmed root folder.** Do not create, edit, move,
+     or delete scripts, prefabs, scenes, ScriptableObjects, or Unity `.meta` files outside that
+     folder.
+   - In **Workhorse Mode**, scope is restricted even further: only modify or create the **exact
+     file(s)** explicitly named by the user within that root folder. Do not touch any other file.
 
-2. **Stay inside the developer's folders.**
-   - Create, edit, move, and delete files **only** inside folders that start with the current
-     developer's prefix (for example, `_Z_` for Terry).
-   - **NEVER change another developer's work.** That includes their scripts, prefabs, scenes,
-     ScriptableObjects, and Unity `.meta` files.
-   - Do not change shared areas outside any developer folder (such as `ProjectSettings/`,
-     `Packages/`, or unprefixed folders in `Assets/`) or any art assets. If a task needs a change
-     there, say so in the plan and let the developer raise it with the team.
-   - You **may read any file** in the project, to understand how systems connect.
-   - When the work touches another developer's code, suggest integration best practices in the
-     plan. This may include asking the developer to request a change from the folder's owner.
-     Name who owns it, and describe exactly what change to ask for and why.
+2. **Protect shared areas and other folders.**
+   - Do not change shared areas outside the confirmed root folder (such as `ProjectSettings/`,
+     `Packages/`, or other folders in `Assets/`) or any art assets. If a task needs a change
+     outside the active root folder, say so in the plan so the developer can coordinate with the
+     appropriate team member.
+   - You **may read any file** in the project to understand how systems connect.
+   - When the work touches code outside the confirmed root folder, suggest integration best
+     practices in the plan and describe exactly what external change is needed and why.
 
-3. **Commit only to the developer's own branch.**
-   - Each developer has a GitHub branch named after them (see the table).
-   - Commit and push only to that branch.
+3. **Never work on `main` or `development`.**
+   - Verify the active Git branch at the start of every session and before any commit.
+   - **The user must NOT be on `main` or `development`.** If the current branch is `main` or
+     `development`, refuse to proceed until the user checks out a different branch.
    - **Never commit or push to `main` or `development`.** Never merge into them, and never
      force-push.
-   - If you are on the wrong branch, stop and tell the developer before committing.
+   - Commit and push only to the user's active feature/personal branch, and only when explicitly
+     asked or confirmed.
 
 4. **Teach advanced techniques.** When a task uses advanced techniques or code (for example,
    events and delegates, coroutines or async code, generics, interfaces and inheritance, design
@@ -144,11 +133,12 @@ with their prefix (for example, any new `_Z_...` folder belongs to Terry).
 
 ## Quick checklist for every task
 
-- [ ] I know who the developer is, and I am calling them by name.
-- [ ] I asked which mode to run in (Education is the default) and I am respecting it.
-- [ ] In Education Mode, I have not edited any files; I only gave code and explanations.
-- [ ] I gave a plan and the developer confirmed it.
-- [ ] Every file I touch is inside the developer's own `_X_` folders.
+- [ ] The current Git branch is NOT `main` or `development`.
+- [ ] The user has specified the active root folder starting with `Assets/_...`, and all work stays inside it.
+- [ ] Running in Education Mode by default (or Workhorse Mode only if explicitly instructed).
+- [ ] If in Education Mode, no files have been edited; only code and explanations were provided.
+- [ ] If in Workhorse Mode, the user specified the exact file(s) to work in, and no additional files were touched.
+- [ ] A plan was given and confirmed before starting work.
 - [ ] The code is well commented (plain text, `<summary>` only) and uses one class per file.
-- [ ] I explained any advanced techniques step by step.
-- [ ] Commits go only to the developer's own branch, never `main` or `development`.
+- [ ] Any advanced techniques were explained step by step.
+- [ ] Any Git commits go only to the active non-protected branch, never `main` or `development`.
