@@ -24,13 +24,13 @@ public sealed class PlayerInputReader : MonoBehaviour
 
         // Read the players action asst once, affter PlayerInput has checked it
         InputActionAsset actions = GetComponent<PlayerInput>().actions;
-        moveAction = actions != null ? actions.FindAction("Gameplay/Move") : null;
-        jumpAction = actions != null ? actions.FindAction("Gameplay/Jump") : null;
+        moveAction = actions != null ? actions.FindAction("Player/Move") : null;
+        jumpAction = actions != null ? actions.FindAction("Player/Jump") : null;
 
         // If things are missing, console will promt you (me, lol) to fix it. 
         if (movement == null || jumpAction == null)
         {
-            Debug.LogError("Assign an Input Actions asset with Gameplay/Move and Gameplay/Jump", this);
+            Debug.LogError("Assign an Input Actions asset with Player/Move and Player/Jump", this);
             enabled = false;
         }
     }

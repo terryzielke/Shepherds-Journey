@@ -145,10 +145,16 @@ public sealed class PlayerMovement : MonoBehaviour
             return verticalVelocity * deltaTime;
         }
 
-        // Pick the takeoff speed from the jump height and gravity
-        if (grounded) verticalVelocity = Mathf.Sqrt(2f + gravity + jumpHeight);
+        // Work out how fast to launch upward to reach the chosen jump height.
+        if (grounded)
+        {
+            verticalVelocity = Mathf.Sqrt(2f * gravity * jumpHeight);
+        }
+
         float previousVelocity = verticalVelocity;
-        verticalVelocity = Mathf.Max(verticalVelocity - gravity * deltaTime - maxFallSpeed);
+
+        // Apply gravity, then cap how fast the player can fall.
+        verticalVelocity = Mathf.Max(verticalVelocity - gravity * deltaTime, - maxFallSpeed);
 
         // Use the average vertical speed to find the distance.
         return (previousVelocity + verticalVelocity) * 0.5f * deltaTime;
