@@ -194,13 +194,26 @@ public class DemoSheepAI : MonoBehaviour
     }
 
     /// <summary>
-    /// Finds the player if needed and starts the sheep off grazing.
+    /// Resets the sheep to a fresh start (grazing, not fleeing) every time it is switched on.
+    /// This runs when the sheep first appears, when the SheepPool shows a reused sheep, and
+    /// when SheepCarriable switches this script back on after a drop.
+    /// </summary>
+    private void OnEnable()
+    {
+        isFleeing = false;
+        EnterIdle();
+    }
+
+    /// <summary>
+    /// Finds the player if needed. Start runs only once per sheep, even if the sheep is hidden
+    /// and reused by the SheepPool, so this slow scene search happens once per sheep instead of
+    /// once per spawn. The fresh-start setup lives in OnEnable, which runs on every reuse.
     /// </summary>
     private void Start()
     {
         if (player == null)
         {
-            // Searching the scene is slow, so it only happens once per sheep, when it spawns.
+            // Searching the scene is slow, so it only happens once per sheep.
             DemoPlayerController playerController = FindAnyObjectByType<DemoPlayerController>();
             if (playerController != null)
             {
@@ -212,10 +225,6 @@ public class DemoSheepAI : MonoBehaviour
                                  "The sheep will wander but will not avoid anyone.", this);
             }
         }
-
-        // Every sheep gets a different random grazing time, so a group of sheep does not all
-        // start walking at the exact same moment, which would look robotic.
-        EnterIdle();
     }
 
     /// <summary>

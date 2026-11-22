@@ -32,16 +32,12 @@ public class InventoryHUD : MonoBehaviour
     // means every change passes through one place we control.
     private SheepEnum selectedSheepType = SheepEnum.Normal;
 
-    /// <summary>
-    /// The player's sheep inventory that this HUD displays, taken from the
-    /// spawner. Is null if the spawner was not assigned in the Inspector.
-    /// </summary>
+    // The player's sheep inventory that this HUD displays, taken from the
+    // spawner. Is null if the spawner was not assigned in the Inspector.
     public PlayerSheepInventory Inventory => sheepSpawner != null ? sheepSpawner.Inventory : null;
 
-    /// <summary>
-    /// The sheep type that is currently selected. Other scripts can read this
-    /// value but cannot change it directly.
-    /// </summary>
+    // The sheep type that is currently selected. Other scripts can read this
+    // value but cannot change it directly.
     public SheepEnum SelectedSheepType => selectedSheepType;
 
     /// <summary>

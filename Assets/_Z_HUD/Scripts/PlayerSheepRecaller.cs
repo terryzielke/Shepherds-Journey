@@ -6,30 +6,10 @@ using UnityEngine.InputSystem;
 // ---------------------------------------------------------------------------------------------
 // PlayerSheepRecaller
 // ---------------------------------------------------------------------------------------------
-// Sends sheep home. A returned sheep runs around the player to the spot behind the camera
-// (the same spot sheep spawn from), then goes back into the PlayerSheepInventory and is destroyed.
-//
-//   Return Held (R by default): the held sheep hops off and runs back.
-//   Recall All  (Q by default): the held sheep, plus every sheep within Recall Radius that is
-//                               not already returning, run back. Sheep still running to the
-//                               holder are included.
-//
-// Why InputActionProperty instead of InputActionReference?
-//   An InputActionProperty can hold EITHER an action defined right here in the Inspector, OR a
-//   reference to an action in an Input Actions asset. The shared InputSystem_Actions has no
-//   actions for these yet, so they start as local actions bound to R and Q. When the team adds
-//   Player/ReturnSheep and Player/RecallSheep, tick "Use Reference" in the Inspector and drag
-//   them in. No code changes.
-//
-// Not handled yet (later tasks):
-//   - Returned sheep are destroyed and new ones are created on spawn. If that happens a lot,
-//     object pooling (hiding and reusing sheep) would save performance.
-//
 // Setup:
 //   - Add this to the ROOT of the Player prefab (it needs PlayerSheepCarrier, PlayerSheepSpawner and
 //     PlayerSheepInventory on the same object; all three are already there).
 //   - Change the keys or add gamepad bindings in the Inspector if needed.
-// ---------------------------------------------------------------------------------------------
 
 /// <summary>
 /// Sends sheep back to the player's inventory. One button returns the held sheep, another
@@ -39,22 +19,16 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerSheepCarrier))]
 [RequireComponent(typeof(PlayerSheepSpawner))]
 [RequireComponent(typeof(PlayerSheepInventory))]
+[RequireComponent(typeof(PlayerSheepPool))]
 public class PlayerSheepRecaller : MonoBehaviour
 {
     [Header("Input")]
-    [Tooltip("Sends the held sheep back to the inventory. A local action on R for now; tick " +
-             "Use Reference and drag in Player/ReturnSheep once the team adds it.")]
-    [SerializeField]
-    private InputActionProperty returnHeldAction =
-        new InputActionProperty(new InputAction("Return Held Sheep", InputActionType.Button, "<Keyboard>/r"));
+    [Tooltip("Sends the held sheep back to the inventory.")]
+    [SerializeField] private InputActionProperty returnHeldAction = new InputActionProperty(new InputAction("Return Held Sheep", InputActionType.Button, "<Keyboard>/r"));
 
-    [Tooltip("Sends every sheep within Recall Radius back to the inventory. A local action on Q " +
-             "for now; tick Use Reference and drag in Player/RecallSheep once the team adds it.")]
-    [SerializeField]
-    private InputActionProperty recallAllAction =
-        new InputActionProperty(new InputAction("Recall All Sheep", InputActionType.Button, "<Keyboard>/q"));
+    [Tooltip("Sends every sheep within Recall Radius back to the inventory.")]
+    [SerializeField] private InputActionProperty recallAllAction = new InputActionProperty(new InputAction("Recall All Sheep", InputActionType.Button, "<Keyboard>/q"));
 
-    [Header("Recall All")]
     [Tooltip("How far from the player a sheep can be and still be recalled, in metres.")]
     [SerializeField] private float recallRadius = 20f;
 
@@ -62,6 +36,7 @@ public class PlayerSheepRecaller : MonoBehaviour
     private PlayerSheepCarrier carrier;
     private PlayerSheepSpawner spawner;
     private PlayerSheepInventory inventory;
+    private PlayerSheepPool sheepPool;
 
     // The last spot behind the camera that was found. If the camera is ever missing for a
     // moment, returning sheep keep heading here instead of stopping.
@@ -76,6 +51,7 @@ public class PlayerSheepRecaller : MonoBehaviour
         carrier = GetComponent<PlayerSheepCarrier>();
         spawner = GetComponent<PlayerSheepSpawner>();
         inventory = GetComponent<PlayerSheepInventory>();
+        sheepPool = GetComponent<PlayerSheepPool>();
     }
 
     /// <summary>
@@ -155,7 +131,7 @@ public class PlayerSheepRecaller : MonoBehaviour
         {
             SheepCarriable sheep = allSheep[i];
 
-            // Skip sheep already on their way home (including the held sheep we just sent).
+            // Skip sheep already on their way home.
             if (sheep == null || sheep.IsReturning)
             {
                 continue;
@@ -187,28 +163,23 @@ public class PlayerSheepRecaller : MonoBehaviour
 
     /// <summary>
     /// Called by SheepCarriable when it reaches the spot behind the camera. Adds one sheep of
-    /// its type back to the inventory and destroys the sheep.
+    /// its type back to the inventory and hides the sheep in the SheepPool for reuse.
     /// </summary>
     public void HandleSheepReturned(SheepCarriable sheep)
     {
-        if (sheep == null)
+        if (sheep == null) return;
+
+        // The pool stores SheepType components, so we need it to hand the sheep back. A sheep
+        // without one cannot go into the inventory or the pool, so it is destroyed instead.
+        if (!sheep.TryGetComponent(out SheepType sheepType))
         {
+            Debug.LogWarning($"[PlayerSheepRecaller] {sheep.name} has no SheepType, so it could not be added to the inventory.", sheep);
+            Destroy(sheep.gameObject);
             return;
         }
 
-        if (sheep.TryGetComponent(out SheepType sheepType))
-        {
-            // AddSheep raises SheepCountChanged, so the HUD buttons update by themselves.
-            inventory.AddSheep(sheepType.SheepEnum);
-        }
-        else
-        {
-            Debug.LogWarning($"[PlayerSheepRecaller] {sheep.name} has no SheepType, so it could not be added to the inventory.", sheep);
-        }
-
-        // Destroy happens at the end of this frame, not instantly. The sheep's OnDisable then
-        // removes it from the ActiveSheep list.
-        Destroy(sheep.gameObject);
+        inventory.AddSheep(sheepType.SheepEnum);
+        sheepPool.Release(sheepType);
     }
 
     // Asks the spawner for the spot behind the camera and remembers it. Returns true if a spot

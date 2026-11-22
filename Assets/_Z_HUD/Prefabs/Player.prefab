@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 3626740639992913607}
   - component: {fileID: 5437556380602300781}
   - component: {fileID: 3469178357076974680}
+  - component: {fileID: 2357125831137711901}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -148,7 +149,6 @@ MonoBehaviour:
     m_Bits: 8
   raycastStartHeight: 10
   raycastLength: 50
-  sheepPrefab: {fileID: 5754159602567946452, guid: 4aca7650e3a1f8849abaf864fa8b4644, type: 3}
 --- !u!114 &5437556380602300781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,6 +224,21 @@ MonoBehaviour:
       m_Flags: 0
     m_Reference: {fileID: 0}
   recallRadius: 20
+--- !u!114 &2357125831137711901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4947866214677261090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af9f5a43b9b3db24aabd0a6f847edc9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSheepPool
+  sheepPrefab: {fileID: 5754159602567946452, guid: 4aca7650e3a1f8849abaf864fa8b4644, type: 3}
+  prewarmCount: 5
+  maxHiddenCount: 30
 --- !u!1 &7845170696663905324
 GameObject:
   m_ObjectHideFlags: 0

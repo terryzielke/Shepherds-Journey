@@ -3,33 +3,6 @@ using UnityEngine;
 
 // PlayerSheepInventory
 // ------------------
-// Keeps track of how many of each sheep type the player is carrying.
-//
-// How the counts are stored:
-// One int per sheep type, kept in an array. The enum value is used as the
-// array index, because every SheepEnum value is a number underneath:
-//
-//     sheepCounts[0] -> Normal
-//     sheepCounts[1] -> Heavy
-//     sheepCounts[2] -> Bouncy
-//     sheepCounts[3] -> Tall
-//     sheepCounts[4] -> Projectile
-//
-// The array size is read from the enum itself, so adding a new sheep type to
-// SheepEnum automatically gives it a slot here.
-//
-// Listening for changes (example for another script, such as a HUD):
-//
-//     [SerializeField] private PlayerSheepInventory inventory;
-//
-//     private void OnEnable()  { inventory.SheepCountChanged += HandleSheepCountChanged; }
-//     private void OnDisable() { inventory.SheepCountChanged -= HandleSheepCountChanged; }
-//
-//     private void HandleSheepCountChanged(SheepEnum sheepType, int newCount)
-//     {
-//         // Update the number shown for this sheep type.
-//     }
-//
 // Setup:
 //   - Add this component to the Player object.
 //   - Change Starting Count in the Inspector if you want a different default.
@@ -47,10 +20,8 @@ public class PlayerSheepInventory : MonoBehaviour
     [Min(0)]
     [SerializeField] private int startingCount = 3;
 
-    /// <summary>
-    /// Raised whenever the count of a sheep type changes. Listeners receive the
-    /// sheep type that changed and its new count.
-    /// </summary>
+    // Raised whenever the count of a sheep type changes. Listeners receive the
+    // sheep type that changed and its new count.
     public event Action<SheepEnum, int> SheepCountChanged;
 
     // One count per sheep type, indexed by the enum's number.

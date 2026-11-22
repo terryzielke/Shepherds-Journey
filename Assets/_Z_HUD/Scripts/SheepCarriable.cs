@@ -6,36 +6,6 @@ using UnityEngine;
 // ---------------------------------------------------------------------------------------------
 // SheepCarriable
 // ---------------------------------------------------------------------------------------------
-// Lets a sheep be commanded by the player. A sheep follows one command at a time:
-//
-//   CARRY (started by PlayerSheepCarrier.Carry):
-//     1. Run around the player (never through them) to a landing spot in front of them.
-//     2. Jump in an arc onto the carrier's SheepHolder.
-//     3. Attach to the holder, so it moves with the player.
-//     Later the carrier calls Drop, or CancelCarry if a newer sheep takes over.
-//
-//   RETURN (started by PlayerSheepRecaller):
-//     1. Run around the player to the point behind the camera.
-//     2. Tell the recaller it has arrived. The recaller adds it to the inventory and
-//        destroys it.
-//
-// Shared run logic (RunAroundPlayer):
-//   Both commands run to a target that can MOVE (the player walks, the camera turns). So
-//   instead of a fixed position, RunAroundPlayer is given a FUNCTION that returns the target,
-//   and it calls that function every physics step to get the latest position. If the player
-//   is standing between the sheep and the target, the sheep first runs to a side point beside
-//   the player, so it never runs through them.
-//
-// The list of all sheep (ActiveSheep):
-//   Every enabled sheep adds itself to one shared, static list, and removes itself when it is
-//   disabled or destroyed. PlayerSheepRecaller loops over this list to find nearby sheep, which is
-//   cheaper and more reliable than a big physics search.
-//
-// Why turn off other behaviours?
-//   While commanded, this script is in charge. Other sheep brains (DemoSheepAI now, Sabine's
-//   real sheep AI later) would fight it. Put them in Behaviours To Disable. They are turned
-//   back on when the sheep is dropped or a carry is cancelled. A returned sheep is destroyed.
-//
 // Setup:
 //   - Add this to the ROOT of the Sheep prefab (the object with the Rigidbody).
 //   - Drag DemoSheepAI into Behaviours To Disable.
@@ -64,8 +34,7 @@ public class SheepCarriable : MonoBehaviour
     [Tooltip("How quickly the sheep turns to face where it is running, in degrees per second.")]
     [SerializeField] private float turnSpeed = 720f;
 
-    [Tooltip("How far to the side of the player the sheep runs when going around them, in metres. " +
-             "Keep it wider than the player and sheep together, or the sheep will clip the player.")]
+    [Tooltip("How far to the side of the player the sheep runs when going around them, in metres. Keep it wider than the player and sheep together, or the sheep will clip the player.")]
     [SerializeField] private float sidePointDistance = 2f;
 
     [Tooltip("How close the sheep must get to the side point to count as reaching it, in metres.")]
@@ -75,8 +44,7 @@ public class SheepCarriable : MonoBehaviour
     [Tooltip("How far in front of the player the sheep stops to jump, in metres.")]
     [SerializeField] private float landingSpotDistance = 2f;
 
-    [Tooltip("Longest the sheep runs towards the player, in seconds. If it gets stuck, it jumps " +
-             "from wherever it is when this time runs out.")]
+    [Tooltip("Longest the sheep runs towards the player, in seconds. If it gets stuck, it jumps from wherever it is when this time runs out.")]
     [SerializeField] private float maxCarryRunTime = 6f;
 
     [Tooltip("How long the jump onto the holder takes, in seconds.")]
@@ -86,13 +54,10 @@ public class SheepCarriable : MonoBehaviour
     [SerializeField] private float jumpHeight = 1.5f;
 
     [Header("Returning")]
-    [Tooltip("How close the sheep must get to the point behind the camera to count as home, in " +
-             "metres. Wider than the side point, so a crowd of returning sheep does not get " +
-             "stuck jostling for one exact spot.")]
+    [Tooltip("How close the sheep must get to the point behind the camera to count as home.")]
     [SerializeField] private float returnReachedDistance = 1.5f;
 
-    [Tooltip("Longest the sheep runs back, in seconds. If it gets stuck, it goes back into the " +
-             "inventory from wherever it is when this time runs out, so no sheep is ever lost.")]
+    [Tooltip("Longest the sheep runs back, in seconds. If it gets stuck, it goes back into the inventory from wherever it is when this time runs out, so no sheep is ever lost.")]
     [SerializeField] private float maxReturnRunTime = 12f;
 
     // Directions shorter than this count as "no direction", so the sheep does not spin on the spot.
@@ -119,32 +84,20 @@ public class SheepCarriable : MonoBehaviour
     // The Rigidbody's interpolation before the jump, so it can be put back exactly.
     private RigidbodyInterpolation savedInterpolation;
 
-    /// <summary>
-    /// Every enabled sheep in the scene. Read-only: other scripts can loop over it, but only
-    /// sheep add or remove themselves.
-    /// </summary>
+    // Every enabled sheep in the scene. Read-only: other scripts can loop over it, but only sheep add or remove themselves.
     public static IReadOnlyList<SheepCarriable> ActiveSheep => activeSheep;
 
-    /// <summary>
-    /// True once the sheep has landed on the holder and is riding with the player.
-    /// </summary>
+    // True once the sheep has landed on the holder and is riding with the player.
     public bool IsAttached { get; private set; }
 
-    /// <summary>
-    /// True from the moment a carry starts until the sheep is dropped or the carry is
-    /// cancelled. That covers running, jumping and riding.
-    /// </summary>
+    // True from the moment a carry starts until the sheep is dropped or the carry is cancelled. That covers running, jumping and riding.
     public bool IsBeingCarried => carrier != null;
 
-    /// <summary>
-    /// True while the sheep is running back to be returned to the inventory.
-    /// </summary>
+    // True while the sheep is running back to be returned to the inventory.
     public bool IsReturning => recaller != null;
 
-    /// <summary>
-    /// True if the sheep is following any command (being carried or returning). A busy sheep
-    /// cannot be picked up or given a new carry.
-    /// </summary>
+    // True if the sheep is following any command (being carried or returning). A busy sheep
+    // cannot be picked up or given a new carry.
     public bool IsBusy => IsBeingCarried || IsReturning;
 
     /// <summary>

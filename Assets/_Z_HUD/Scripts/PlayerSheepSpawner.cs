@@ -2,24 +2,6 @@ using UnityEngine;
 
 // PlayerSheepSpawner
 // ----------------
-// Spawns a sheep of a chosen type on the ground behind the camera, and uses up
-// one sheep of that type from the player's PlayerSheepInventory.
-//
-// Why is this on the Player and not on the HUD?
-// The Player owns the inventory. The HUD's job is only to show buttons and pass
-// on clicks. Keeping spawning here means other things (a keyboard shortcut, a
-// quest, a cutscene) can spawn sheep too, without needing the HUD.
-//
-// How the spawn spot is found (see TryGetSpawnPose):
-//   1. Take the camera's forward direction and flatten it so it is level with
-//      the ground. The orbit camera tilts down at the player, so without this,
-//      "behind the camera" would point up into the sky.
-//   2. Step backwards from the camera along that flat direction.
-//   3. Fire a ray straight down from above that point to find the ground, so
-//      the sheep stands on the terrain instead of floating at camera height.
-//   4. If the ray hits nothing (for example, no ground layer was set), fall
-//      back to the player's own height so the sheep still appears.
-//
 // Setup:
 //   - Add this component to the Player object (it needs a PlayerSheepInventory on
 //     the same object; Unity adds one automatically if it is missing).
@@ -27,7 +9,8 @@ using UnityEngine;
 //     camera tagged MainCamera.
 //   - Set Ground Mask to the ground or terrain layers. Leave out the Player and
 //     Sheep layers so the ray does not land on top of them.
-//   - Drag the Sheep prefab from the Project window into Sheep Prefab.
+//   - The Sheep prefab is set on the SheepPool component (also on the Player). Sheep are taken
+//     from that pool instead of being created with Instantiate, so they can be reused.
 
 /// <summary>
 /// Spawns sheep on the ground behind the camera. Each spawn uses up one sheep
@@ -36,6 +19,7 @@ using UnityEngine;
 /// </summary>
 [RequireComponent(typeof(PlayerSheepInventory))]
 [RequireComponent(typeof(PlayerSheepCarrier))]
+[RequireComponent(typeof(PlayerSheepPool))]
 public class PlayerSheepSpawner : MonoBehaviour
 {
     [Header("Spawn Position")]
@@ -54,12 +38,9 @@ public class PlayerSheepSpawner : MonoBehaviour
     [Tooltip("How far the downward ray travels, in metres, before giving up.")]
     [SerializeField] private float raycastLength = 50f;
 
-    [Header("Sheep")]
-    [Tooltip("The Sheep prefab to spawn. Its type is set after it is created.")]
-    [SerializeField] private SheepType sheepPrefab;
-
     private PlayerSheepInventory inventory;
     private PlayerSheepCarrier carrier;
+    private PlayerSheepPool sheepPool;
 
     /// <summary>
     /// The player's sheep inventory, on the same GameObject as this spawner.
@@ -86,6 +67,7 @@ public class PlayerSheepSpawner : MonoBehaviour
     private void Awake()
     {
         carrier = GetComponent<PlayerSheepCarrier>();
+        sheepPool = GetComponent<PlayerSheepPool>();
 
         if (spawnCamera == null)
         {
@@ -95,11 +77,6 @@ public class PlayerSheepSpawner : MonoBehaviour
         if (spawnCamera == null)
         {
             Debug.LogWarning("[PlayerSheepSpawner] Spawn Camera is not assigned. Drag the Player's PlayerSheepSpawner child into it.", this);
-        }
-
-        if (sheepPrefab == null)
-        {
-            Debug.LogWarning("[PlayerSheepSpawner] Sheep Prefab is not assigned. Drag the Sheep prefab into it.", this);
         }
     }
 
@@ -111,7 +88,8 @@ public class PlayerSheepSpawner : MonoBehaviour
     /// </summary>
     public bool TrySpawnSheep(SheepEnum SheepEnum)
     {
-        if (sheepPrefab == null)
+
+        if (!sheepPool.IsReady)
         {
             return false;
         }
@@ -125,9 +103,8 @@ public class PlayerSheepSpawner : MonoBehaviour
         {
             return false;
         }
-
-        // Create the sheep
-        SheepType newSheep = Instantiate(sheepPrefab, spawnPosition, spawnRotation);
+        // Take a sheep from the pool instead of creating a new one with Instantiate, so it can be reused.
+        SheepType newSheep = sheepPool.Get(spawnPosition, spawnRotation);
 
         // Turn this copy into the chosen type
         newSheep.SetSheepEnum(SheepEnum);
@@ -145,7 +122,7 @@ public class PlayerSheepSpawner : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[PlayerSheepSpawner] The sheep prefab {sheepPrefab.name} has no SheepCarriable component. Drag the SheepCarriable script onto the prefab so it can be carried.", newSheep);
+            Debug.LogWarning($"[PlayerSheepSpawner] The sheep prefab {newSheep.name} has no SheepCarriable component. Drag the SheepCarriable script onto the prefab so it can be carried.", newSheep);
         }
 
         return true;
