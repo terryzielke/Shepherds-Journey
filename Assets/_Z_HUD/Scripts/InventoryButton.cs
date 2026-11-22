@@ -1,5 +1,8 @@
+using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 // InventoryButton
@@ -8,15 +11,18 @@ using UnityEngine.UI;
 //   1. When clicked, it tells the InventoryHUD which sheep type it stands for.
 //   2. It shows how many of that sheep the player has, and greys itself out
 //      (stops being clickable) when the count reaches 0.
+//   3. It lets a keyboard key (its hotkey) press the button, exactly as if
+//      the player had clicked it with the mouse.
 //
 // Why a script instead of the OnClick list in the Inspector?
 // The Inspector's OnClick list can only pass simple values (int, float,
 // string, bool, or an Object). It cannot pass an enum like SheepEnum.
-
+//
 /// <summary>
 /// Links a UI Button to one sheep type. Sends its sheep type to the
-/// InventoryHUD when clicked, shows how many of that sheep the player
-/// has, and becomes unclickable when the player has none left.
+/// InventoryHUD when clicked or when its hotkey is pressed, shows how many of
+/// that sheep the player has, and becomes unclickable when the player has
+/// none left.
 /// </summary>
 [RequireComponent(typeof(Button))]
 public class InventoryButton : MonoBehaviour
@@ -29,6 +35,9 @@ public class InventoryButton : MonoBehaviour
 
     [Tooltip("The HUD to notify on click. Leave empty to find it on a parent object.")]
     [SerializeField] private InventoryHUD inventoryHUD;
+    
+    [Tooltip("The hotkey binding.")]
+    [SerializeField] private InputActionProperty hotkeyAction = new InputActionProperty(new InputAction("Sheep Hotkey", InputActionType.Button));
 
     // The Button component on this same GameObject, cached in Awake.
     private Button button;
@@ -48,6 +57,9 @@ public class InventoryButton : MonoBehaviour
     {
         button = GetComponent<Button>();
 
+        // Warn if the hotkey action is not assigned or has no binding.
+        WarnIfHotkeyMissing();
+
         // Only search if nothing was assigned in the Inspector. GetComponentInParent
         // checks this object first, then walks up the hierarchy:
         // Button -> SheepButtonBar -> Canvas -> InventoryHUD.
@@ -58,8 +70,7 @@ public class InventoryButton : MonoBehaviour
 
         if (inventoryHUD == null)
         {
-            Debug.LogWarning($"[InventoryButton] No InventoryHUD found for {name}. " +
-                             "Assign one in the Inspector or place this button under InventoryHUD.", this);
+            Debug.LogWarning($"[InventoryButton] No InventoryHUD found for {name}. Assign one in the Inspector or place this button under InventoryHUD.", this);
             return;
         }
 
@@ -80,20 +91,15 @@ public class InventoryButton : MonoBehaviour
     private void OnEnable()
     {
         button.onClick.AddListener(HandleClick);
+        StartListening(hotkeyAction, HandleHotkeyPerformed);
 
         if (inventory != null)
         {
-            // Subscribing is always safe, even if the inventory's Awake has
-            // not run yet. We are only adding our method to its list.
+            // Subscribing is safe, even if the inventory's Awake has not run yet.
             inventory.SheepCountChanged += HandleSheepCountChanged;
         }
 
-        // TIMING TRAP: when the scene first loads, this OnEnable can run BEFORE
-        // the inventory's Awake has created its count array, so calling
-        // GetCount here would crash. On that first load we wait for Start.
-        // But if the button is turned off and on again later (Start does not
-        // run a second time), counts may have changed while it was off and no
-        // events reached it. So after the first Start, OnEnable refreshes.
+        // Refresh the count immediately, so the button shows the right number
         if (hasStarted)
         {
             RefreshCount();
@@ -116,10 +122,9 @@ public class InventoryButton : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
-        // Every subscribe needs a matching unsubscribe. Without these, a
-        // disabled or destroyed button would still be on the lists and could
-        // be called again, causing double clicks or errors.
+        // Unsubscribe from the button and inventory events to avoid memory leaks and null reference errors.
         button.onClick.RemoveListener(HandleClick);
+        StopListening(hotkeyAction, HandleHotkeyPerformed);
 
         if (inventory != null)
         {
@@ -130,24 +135,23 @@ public class InventoryButton : MonoBehaviour
     // Called by the Button every time it is clicked.
     private void HandleClick()
     {
-        if (inventoryHUD == null)
-        {
-            // Already warned in Awake; skip quietly so we do not spam the Console.
-            return;
-        }
+        if (inventoryHUD == null) return;
 
         inventoryHUD.SelectSheepType(sheepType);
     }
 
+    // Called by the Input System when this button's hotkey is pressed.
+    private void HandleHotkeyPerformed(InputAction.CallbackContext context)
+    {
+        var eventData = new BaseEventData(EventSystem.current);
+        ExecuteEvents.Execute(button.gameObject, eventData, ExecuteEvents.submitHandler);
+    }
+
     // Called by SheepInventory whenever ANY sheep count changes.
-    // The parameters must match the event's type: Action<SheepEnum, int>.
     private void HandleSheepCountChanged(SheepEnum changedSheepType, int newCount)
     {
         // All five buttons hear every change. Only the matching button reacts.
-        if (changedSheepType != sheepType)
-        {
-            return;
-        }
+        if (changedSheepType != sheepType) return;
 
         UpdateDisplay(newCount);
     }
@@ -155,17 +159,12 @@ public class InventoryButton : MonoBehaviour
     // Reads this button's count straight from the inventory and shows it.
     private void RefreshCount()
     {
-        if (inventory == null)
-        {
-            return;
-        }
+        if (inventory == null) return;
 
         UpdateDisplay(inventory.GetCount(sheepType));
     }
 
     // Shows the count on the label and greys the button out at 0.
-    // Kept in one method so the event path and the refresh path always
-    // display the count the same way.
     private void UpdateDisplay(int count)
     {
         if (countText != null)
@@ -177,9 +176,42 @@ public class InventoryButton : MonoBehaviour
             countText.SetText("{0}", count);
         }
 
-        // A non-interactable Button ignores clicks and switches to its
-        // Disabled Color (set in the Button's Inspector), which is what
-        // makes it look greyed out.
+        // A non-interactable Button ignores clicks and switches to its Disabled Color.
         button.interactable = count > 0;
+    }
+
+    // Warns if the hotkey action is not assigned or has no binding.
+    private void WarnIfHotkeyMissing()
+    {
+        InputAction action = hotkeyAction.action;
+        
+        if(action == null || action.bindings.Count == 0)
+        {
+            Debug.LogWarning($"[InventoryButton] Hotkey action is not assigned or has no binding on {name}. Assign one in the Inspector.", this);
+        }
+    }
+
+    // Starts listening for the given action, if it is assigned.
+    private static void StartListening(InputActionProperty property, Action<InputAction.CallbackContext> handler)
+    {
+        InputAction action = property.action;
+        if (action == null) return;
+        
+        action.performed += handler;
+        action.Enable();
+    }
+
+    // Stops listening for the given action, if it is assigned.
+    private static void StopListening(InputActionProperty property, Action<InputAction.CallbackContext> handler)
+    {
+        InputAction action = property.action;
+        if (action == null) return;
+
+        action.performed -= handler;
+
+        if(property.reference == null)
+        {
+            action.Disable();
+        }
     }
 }

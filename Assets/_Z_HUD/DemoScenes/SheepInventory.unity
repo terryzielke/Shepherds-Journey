@@ -257,6 +257,26 @@ MonoBehaviour:
   sheepType: 3
   countText: {fileID: 1460089479}
   inventoryHUD: {fileID: 0}
+  hotkeyAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Sheep Hotkey
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: 8b8a7f75-01c2-4ddc-9204-94d9a0e72bb2
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: c4936dfe-393e-44eb-9451-57424f82abfd
+        m_Path: <Keyboard>/4
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Sheep Hotkey
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
 --- !u!1 &73471534
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,6 +905,26 @@ MonoBehaviour:
   sheepType: 4
   countText: {fileID: 879632093}
   inventoryHUD: {fileID: 0}
+  hotkeyAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Sheep Hotkey
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: 8f7d9b2f-497b-4780-bba1-38a55a7221a4
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 72f0bede-b869-46dd-a4f2-05bd20a78a11
+        m_Path: <Keyboard>/5
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Sheep Hotkey
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
 --- !u!1 &495621997
 GameObject:
   m_ObjectHideFlags: 0
@@ -1616,6 +1656,26 @@ MonoBehaviour:
   sheepType: 2
   countText: {fileID: 504423561}
   inventoryHUD: {fileID: 0}
+  hotkeyAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Sheep Hotkey
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: b7d00bee-df97-4b27-ae61-8ef24f2e498f
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 76cbe43e-4083-48dd-a5b8-da3a224d7145
+        m_Path: <Keyboard>/3
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Sheep Hotkey
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
 --- !u!1 &956791284
 GameObject:
   m_ObjectHideFlags: 0
@@ -2177,6 +2237,26 @@ MonoBehaviour:
   sheepType: 1
   countText: {fileID: 73471536}
   inventoryHUD: {fileID: 0}
+  hotkeyAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Sheep Hotkey
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: bf9a69b6-3e8f-4393-9058-fac075d5bd8b
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 3b4201f0-e79a-48ba-bef1-1d24dd13f15f
+        m_Path: <Keyboard>/2
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Sheep Hotkey
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
 --- !u!4 &1286559374 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6466789829940302561, guid: d53826f79ae1fcd4d8c028cdaf9e92cb, type: 3}
@@ -2558,6 +2638,26 @@ MonoBehaviour:
   sheepType: 0
   countText: {fileID: 1086146753}
   inventoryHUD: {fileID: 0}
+  hotkeyAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Sheep Hotkey
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: 403846c9-9929-4a5b-9986-2c13293057ed
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: d330a510-2c79-4b29-8f89-0a823bdf73a5
+        m_Path: <Keyboard>/1
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Sheep Hotkey
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
 --- !u!114 &2023013725
 MonoBehaviour:
   m_ObjectHideFlags: 0
