@@ -1,9 +1,9 @@
 using UnityEngine;
 
-// SheepSpawner
+// PlayerSheepSpawner
 // ----------------
 // Spawns a sheep of a chosen type on the ground behind the camera, and uses up
-// one sheep of that type from the player's SheepInventory.
+// one sheep of that type from the player's PlayerSheepInventory.
 //
 // Why is this on the Player and not on the HUD?
 // The Player owns the inventory. The HUD's job is only to show buttons and pass
@@ -21,7 +21,7 @@ using UnityEngine;
 //      back to the player's own height so the sheep still appears.
 //
 // Setup:
-//   - Add this component to the Player object (it needs a SheepInventory on
+//   - Add this component to the Player object (it needs a PlayerSheepInventory on
 //     the same object; Unity adds one automatically if it is missing).
 //   - Drag the Main Camera into Spawn Camera, or leave it empty to use the
 //     camera tagged MainCamera.
@@ -31,12 +31,12 @@ using UnityEngine;
 
 /// <summary>
 /// Spawns sheep on the ground behind the camera. Each spawn uses up one sheep
-/// of that type from the player's SheepInventory, and nothing spawns if the
+/// of that type from the player's PlayerSheepInventory, and nothing spawns if the
 /// player has none left.
 /// </summary>
-[RequireComponent(typeof(SheepInventory))]
-[RequireComponent(typeof(SheepCarrier))]
-public class SheepSpawner : MonoBehaviour
+[RequireComponent(typeof(PlayerSheepInventory))]
+[RequireComponent(typeof(PlayerSheepCarrier))]
+public class PlayerSheepSpawner : MonoBehaviour
 {
     [Header("Spawn Position")]
     [Tooltip("The camera that sheep spawn behind. Leave empty to use the camera tagged MainCamera.")]
@@ -56,23 +56,23 @@ public class SheepSpawner : MonoBehaviour
 
     [Header("Sheep")]
     [Tooltip("The Sheep prefab to spawn. Its type is set after it is created.")]
-    [SerializeField] private SheepSelectType sheepPrefab;
+    [SerializeField] private SheepType sheepPrefab;
 
-    private SheepInventory inventory;
-    private SheepCarrier carrier;
+    private PlayerSheepInventory inventory;
+    private PlayerSheepCarrier carrier;
 
     /// <summary>
     /// The player's sheep inventory, on the same GameObject as this spawner.
     /// Safe to read at any time, even from another script's Awake.
     /// </summary>
-    public SheepInventory Inventory
+    public PlayerSheepInventory Inventory
     {
         get
         {
             // Lazy lookup: we find the inventory the first time someone asks, instead of in our own Awake.
             if (inventory == null)
             {
-                inventory = GetComponent<SheepInventory>();
+                inventory = GetComponent<PlayerSheepInventory>();
             }
 
             return inventory;
@@ -85,7 +85,7 @@ public class SheepSpawner : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        carrier = GetComponent<SheepCarrier>();
+        carrier = GetComponent<PlayerSheepCarrier>();
 
         if (spawnCamera == null)
         {
@@ -94,12 +94,12 @@ public class SheepSpawner : MonoBehaviour
 
         if (spawnCamera == null)
         {
-            Debug.LogWarning("[SheepSpawner] Spawn Camera is not assigned. Drag the Player's SheepSpawner child into it.", this);
+            Debug.LogWarning("[PlayerSheepSpawner] Spawn Camera is not assigned. Drag the Player's PlayerSheepSpawner child into it.", this);
         }
 
         if (sheepPrefab == null)
         {
-            Debug.LogWarning("[SheepSpawner] Sheep Prefab is not assigned. Drag the Sheep prefab into it.", this);
+            Debug.LogWarning("[PlayerSheepSpawner] Sheep Prefab is not assigned. Drag the Sheep prefab into it.", this);
         }
     }
 
@@ -109,7 +109,7 @@ public class SheepSpawner : MonoBehaviour
     /// Returns false, and changes nothing, if the spawner is not set up or the
     /// player has none of that type left.
     /// </summary>
-    public bool TrySpawnSheep(SheepTypes sheepType)
+    public bool TrySpawnSheep(SheepEnum SheepEnum)
     {
         if (sheepPrefab == null)
         {
@@ -121,19 +121,19 @@ public class SheepSpawner : MonoBehaviour
             return false;
         }
 
-        if (!Inventory.TryRemoveSheep(sheepType))
+        if (!Inventory.TryRemoveSheep(SheepEnum))
         {
             return false;
         }
 
         // Create the sheep
-        SheepSelectType newSheep = Instantiate(sheepPrefab, spawnPosition, spawnRotation);
+        SheepType newSheep = Instantiate(sheepPrefab, spawnPosition, spawnRotation);
 
         // Turn this copy into the chosen type
-        newSheep.SetSheepType(sheepType);
+        newSheep.SetSheepEnum(SheepEnum);
 
         // Rename the sheep so it is clear in the Hierarchy what type it is
-        newSheep.name = $"{sheepType} Sheep";
+        newSheep.name = $"{SheepEnum} Sheep";
 
         // Hand the new sheep to the carrier, which sends it running to the SheepHolder.
         // Instantiate has already run the sheep's Awake, so it is ready for this call.
@@ -145,16 +145,19 @@ public class SheepSpawner : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[SheepSpawner] The sheep prefab {sheepPrefab.name} has no SheepCarriable component. Drag the SheepCarriable script onto the prefab so it can be carried.", newSheep);
+            Debug.LogWarning($"[PlayerSheepSpawner] The sheep prefab {sheepPrefab.name} has no SheepCarriable component. Drag the SheepCarriable script onto the prefab so it can be carried.", newSheep);
         }
 
         return true;
     }
 
-    // Works out the position and facing for a new sheep: on the ground, a set
-    // distance behind the camera, facing the same way the camera faces.
-    // Returns false only if there is no camera to spawn behind.
-    private bool TryGetSpawnPose(out Vector3 position, out Quaternion rotation)
+    /// <summary>
+    /// Works out the spot behind the camera: on the ground, a set distance behind the camera,
+    /// facing the way the camera faces. New sheep spawn here, and PlayerSheepRecaller sends returning
+    /// sheep back here, so spawning and returning always agree on the spot. Gives back the
+    /// position and facing, and returns false only if there is no camera.
+    /// </summary>
+    public bool TryGetSpawnPose(out Vector3 position, out Quaternion rotation)
     {
         // An "out" parameter must always be given a value before the method returns.
         position = Vector3.zero;

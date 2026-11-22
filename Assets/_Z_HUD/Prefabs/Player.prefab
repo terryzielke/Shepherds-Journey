@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 1821764338119784273}
   - component: {fileID: 3626740639992913607}
   - component: {fileID: 5437556380602300781}
+  - component: {fileID: 3469178357076974680}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -170,6 +171,59 @@ MonoBehaviour:
   dropDistance: 1.5
   dropForwardSpeed: 2
   dropUpwardSpeed: 2
+--- !u!114 &3469178357076974680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4947866214677261090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 854c8ac2f0048954d810f115be3decb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SheepRecaller
+  returnHeldAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Return Held Sheep
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: a39f5595-ae31-4c83-a6de-e2493e4d5238
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 90ff71ee-6278-4a09-9621-f8b485182408
+        m_Path: <Keyboard>/r
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Return Held Sheep
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  recallAllAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Recall All Sheep
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: 8049a204-42ac-4d4a-bf5f-c0e46b16632f
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings:
+      - m_Name: 
+        m_Id: 5f83936a-b756-402c-b893-a62656bcef52
+        m_Path: <Keyboard>/q
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Recall All Sheep
+        m_Flags: 0
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  recallRadius: 20
 --- !u!1 &7845170696663905324
 GameObject:
   m_ObjectHideFlags: 0

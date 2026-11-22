@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
 // ---------------------------------------------------------------------------------------------
-// SheepCarrier
+// PlayerSheepCarrier
 // ---------------------------------------------------------------------------------------------
 // The player's side of carrying sheep. It knows where the SheepHolder is, which sheep is being
 // held, and which sheep is on its way. It also listens for the drop button.
@@ -13,7 +13,7 @@ using UnityEngine.Serialization;
 //   heldSheep     - the sheep sitting on the holder right now.
 //
 // Setup:
-//   - Add this to the ROOT of the Player prefab (next to SheepSpawner).
+//   - Add this to the ROOT of the Player prefab (next to PlayerSheepSpawner).
 //   - Drag the Player's SheepHolder child into Sheep Holder.
 //   - Drag Player/Interact from Assets/InputSystem_Actions into Drop Action.
 // ---------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ using UnityEngine.Serialization;
 /// holder, swaps out the old sheep when a new one arrives, and drops the held sheep in front of
 /// the player when the drop button is pressed.
 /// </summary>
-public class SheepCarrier : MonoBehaviour
+public class PlayerSheepCarrier : MonoBehaviour
 {
     [Header("Holding")]
     [Tooltip("Where a carried sheep sits. Drag the Player's SheepHolder child here.")]
@@ -74,7 +74,7 @@ public class SheepCarrier : MonoBehaviour
     {
         if (sheepHolder == null)
         {
-            Debug.LogWarning("[SheepCarrier] Sheep Holder is not assigned. Drag the Player's SheepHolder child into it.", this);
+            Debug.LogWarning("[PlayerSheepCarrier] Sheep Holder is not assigned. Drag the Player's SheepHolder child into it.", this);
         }
     }
 
@@ -101,11 +101,12 @@ public class SheepCarrier : MonoBehaviour
     /// <summary>
     /// Sends the given sheep running to the holder. If another sheep is still on its way, that
     /// one is cancelled first. A sheep already on the holder stays there until the new sheep
-    /// starts its jump. Called by SheepSpawner right after it spawns a sheep.
+    /// starts its jump. Called by PlayerSheepSpawner right after it spawns a sheep.
     /// </summary>
     public void Carry(SheepCarriable sheep)
     {
-        if (sheep == null || sheep == incomingSheep || sheep == heldSheep) return;
+        // A busy sheep is already held, already on its way, or returning to the inventory.
+        if (sheep == null || sheep.IsBusy) return;
 
         if (sheepHolder == null) return;
 
@@ -141,11 +142,8 @@ public class SheepCarrier : MonoBehaviour
             // it finds one. The ground, the player and so on simply return null.
             SheepCarriable sheep = overlapResults[i].GetComponentInParent<SheepCarriable>();
 
-            // Skip non-sheep, and sheep that are already running, jumping or riding.
-            if (sheep == null || sheep.IsBeingCarried)
-            {
-                continue;
-            }
+            // Skip non-sheep, and busy sheep.
+            if (sheep == null || sheep.IsBusy) continue;
 
             // Squared distance is enough for "which is closest" and skips a square root.
             float sqrDistance = (sheep.transform.position - transform.position).sqrMagnitude;
@@ -172,18 +170,37 @@ public class SheepCarrier : MonoBehaviour
     /// </summary>
     public bool TryDropHeldSheep()
     {
-        if(heldSheep == null) return false;
+        // "out _" is a discard: we must pass something for the out parameter, but we do not
+        // need the value here, so the underscore throws it away.
+        return TryDropHeldSheep(out _);
+    }
 
-        // Drop the sheep in front of the player with a small hop.
+    /// <summary>
+    /// Drops the held sheep in front of the player with a small hop, and hands back the sheep
+    /// that was dropped so the caller can give it a new command. Returns true if a sheep was
+    /// dropped, or false (and no sheep) if the player was not holding one.
+    /// </summary>
+    public bool TryDropHeldSheep(out SheepCarriable droppedSheep)
+    {
+        droppedSheep = heldSheep;
+
+        if (heldSheep == null)
+        {
+            return false;
+        }
+
+        // Flat forward, so the drop spot is level even if the player is ever tilted.
         Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
+
+        // In front of the player at holder height. The sheep then falls to the ground.
         Vector3 dropPosition = transform.position + forward * dropDistance;
         dropPosition.y = sheepHolder.position.y;
+
         Vector3 launchVelocity = forward * dropForwardSpeed + Vector3.up * dropUpwardSpeed;
 
-        // Clear the held sheep before calling Drop, so it does not try to call back into us.
-        SheepCarriable sheepToDrop = heldSheep;
+        // Clear our reference BEFORE telling the sheep to drop.
         heldSheep = null;
-        sheepToDrop.Drop(dropPosition, launchVelocity);
+        droppedSheep.Drop(dropPosition, launchVelocity);
 
         return true;
     }
@@ -206,6 +223,23 @@ public class SheepCarrier : MonoBehaviour
         if (sheep != incomingSheep) return;
         heldSheep = sheep;
         incomingSheep = null;
+    }
+
+    /// <summary>
+    /// Called by SheepCarriable when it stops being carried for its own reasons, such as being
+    /// recalled to the inventory. Forgets the sheep, whether it was held or still on its way.
+    /// </summary>
+    public void HandleSheepLeaving(SheepCarriable sheep)
+    {
+        if (sheep == heldSheep)
+        {
+            heldSheep = null;
+        }
+
+        if (sheep == incomingSheep)
+        {
+            incomingSheep = null;
+        }
     }
 
     // Called by the Input System when the interact action is performed. The parameter type must

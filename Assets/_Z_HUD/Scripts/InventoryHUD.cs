@@ -25,24 +25,24 @@ using UnityEngine;
 public class InventoryHUD : MonoBehaviour
 {
     [Tooltip("The player's sheep spawner. Drag the Player object from the scene here.")]
-    [SerializeField] private SheepSpawner sheepSpawner;
+    [SerializeField] private PlayerSheepSpawner sheepSpawner;
 
     // The sheep type that is currently selected. Private so that other scripts
     // cannot change it directly; they must go through SelectSheepType, which
     // means every change passes through one place we control.
-    private SheepTypes selectedSheepType = SheepTypes.Normal;
+    private SheepEnum selectedSheepType = SheepEnum.Normal;
 
     /// <summary>
     /// The player's sheep inventory that this HUD displays, taken from the
     /// spawner. Is null if the spawner was not assigned in the Inspector.
     /// </summary>
-    public SheepInventory Inventory => sheepSpawner != null ? sheepSpawner.Inventory : null;
+    public PlayerSheepInventory Inventory => sheepSpawner != null ? sheepSpawner.Inventory : null;
 
     /// <summary>
     /// The sheep type that is currently selected. Other scripts can read this
     /// value but cannot change it directly.
     /// </summary>
-    public SheepTypes SelectedSheepType => selectedSheepType;
+    public SheepEnum SelectedSheepType => selectedSheepType;
 
     /// <summary>
     /// Warns early if the inventory was not assigned, so the problem shows up
@@ -61,13 +61,13 @@ public class InventoryHUD : MonoBehaviour
     /// Selects the given sheep type and writes it to the Console. Called by the
     /// sheep buttons when they are clicked.
     /// </summary>
-    public void SelectSheepType(SheepTypes sheepType)
+    public void SelectSheepType(SheepEnum sheepType)
     {
         selectedSheepType = sheepType;
         SpawnSheep(selectedSheepType);
     }
 
-    public void SpawnSheep(SheepTypes sheepType)
+    public void SpawnSheep(SheepEnum sheepType)
     {
         if (sheepSpawner == null) return;
 

@@ -11,7 +11,7 @@ using UnityEngine.UI;
 //
 // Why a script instead of the OnClick list in the Inspector?
 // The Inspector's OnClick list can only pass simple values (int, float,
-// string, bool, or an Object). It cannot pass an enum like SheepTypes.
+// string, bool, or an Object). It cannot pass an enum like SheepEnum.
 
 /// <summary>
 /// Links a UI Button to one sheep type. Sends its sheep type to the
@@ -22,7 +22,7 @@ using UnityEngine.UI;
 public class InventoryButton : MonoBehaviour
 {
     [Tooltip("The sheep type this button selects.")]
-    [SerializeField] private SheepTypes sheepType = SheepTypes.Normal;
+    [SerializeField] private SheepEnum sheepType = SheepEnum.Normal;
 
     [Tooltip("The text that shows how many of this sheep the player has.")]
     [SerializeField] private TMP_Text countText;
@@ -34,7 +34,7 @@ public class InventoryButton : MonoBehaviour
     private Button button;
 
     // The player's sheep inventory, taken from the HUD in Awake.
-    private SheepInventory inventory;
+    private PlayerSheepInventory inventory;
 
     // Becomes true once Start has run. Used by OnEnable to know whether it is
     // safe to read the inventory yet (see the timing notes in OnEnable).
@@ -140,8 +140,8 @@ public class InventoryButton : MonoBehaviour
     }
 
     // Called by SheepInventory whenever ANY sheep count changes.
-    // The parameters must match the event's type: Action<SheepTypes, int>.
-    private void HandleSheepCountChanged(SheepTypes changedSheepType, int newCount)
+    // The parameters must match the event's type: Action<SheepEnum, int>.
+    private void HandleSheepCountChanged(SheepEnum changedSheepType, int newCount)
     {
         // All five buttons hear every change. Only the matching button reacts.
         if (changedSheepType != sheepType)

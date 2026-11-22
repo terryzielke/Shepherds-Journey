@@ -7,7 +7,7 @@
 /// The different kinds of sheep used by the HUD. Each value names one
 /// sheep type, so scripts can store and compare sheep types safely.
 /// </summary>
-public enum SheepTypes
+public enum SheepEnum
 {
     /// <summary>
     /// A standard sheep with no special ability. This is the default value.
