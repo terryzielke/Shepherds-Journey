@@ -184,12 +184,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05a6d9db553e5004cba16537b625976e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  walkSpeed: 4
+  walkSpeed: 7
   groundAcceleration: 28
   groundBraking: 32
   airAcceleration: 8
   turnSpeed: 720
-  jumpHeight: 4
+  jumpHeight: 7
   gravity: 24
   maxFallSpeed: 35
   movementCamera: {fileID: 833980129}

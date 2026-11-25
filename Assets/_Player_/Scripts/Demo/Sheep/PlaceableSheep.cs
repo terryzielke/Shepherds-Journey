@@ -3,9 +3,7 @@ using UnityEngine;
 
 
 /// <summary>
-/// Sabine's component can use this interface and read her own sheep data.
-/// The same quesitons are asked while aiming and placing sheep. (The I is 
-/// for "Interface"... not my fat fingers.)
+/// Sabine's component can read this interface and answer with her own
 /// </summary>
 public interface ISheepSurfaceRules
 {
@@ -22,6 +20,14 @@ public interface ISheepSurfaceRules
 
 public sealed class PlaceableSheep : MonoBehaviour
 {
+
+    public enum PlacementState
+    {
+        Available, 
+        Held, 
+        Placed
+    }
+
     // Sabine's component that uses ISheepSurfaceRules will be dragged into this slot.
     // For the demo, there is a demo inventory that supplies the rule.
     [SerializeField] private MonoBehaviour surfaceRuleSource;
@@ -37,7 +43,9 @@ public sealed class PlaceableSheep : MonoBehaviour
     private ISheepSurfaceRules surfaceRules;
 
 
-    // Other scripts can read these values, but can't change em.
+    // State is independent of the collider reference. A placed sheep
+    // stays Placed even if the puzzle surface gets destroyed.
+    public PlacementState State { get; private set; } = PlacementState.Available;
     public bool IsHeld { get; private set; }
     public Collider PlacedSurface { get; private set; }
 
@@ -97,7 +105,7 @@ public sealed class PlaceableSheep : MonoBehaviour
         body.interpolation = RigidbodyInterpolation.None;
         bodyCollider.enabled = false;
 
-        IsHeld = true;
+        State = PlacementState.Held;
         PlacedSurface = null;
 
         // Makes the player the sheeps daddy, so the sheep follows the players walk/jump.
@@ -105,7 +113,6 @@ public sealed class PlaceableSheep : MonoBehaviour
         transform.SetParent(socket, true);
         transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         SetPlacedAnimation(false);
-
         return true;
     }
 
@@ -116,9 +123,7 @@ public sealed class PlaceableSheep : MonoBehaviour
     /// <returns>True if placement is allowed.</returns>
     internal bool AllowsSurface(RaycastHit hit)
     {
-        // Ask the 'rule provider' surface nromal, the object we hit
-        // and any sheep data it owns. 
-        return surfaceRules != null && surfaceRules.AllowsSurface(this, hit);
+        return IsRuleAvailable(surfaceRules) && surfaceRules.AllowsSurface(this, hit);
     }
 
 
@@ -132,7 +137,7 @@ public sealed class PlaceableSheep : MonoBehaviour
         transform.SetParent(null, true);
         transform.SetPositionAndRotation(pose.position, pose.rotation);
 
-        IsHeld = false;
+        State = PlacementState.Placed;
         PlacedSurface = surface;
 
         // Sheepy stays kinimatic, the collider is solid again so it can
@@ -141,6 +146,17 @@ public sealed class PlaceableSheep : MonoBehaviour
         SetPlacedAnimation(true);
     }
 
+
+
+    private static bool IsRuleAvailable(ISheepSurfaceRules rules)
+    {
+        // Interface reference can outlive its unity component, so it 
+        // compares object type so destoryed providers fail safley
+        if (rules is Object unityObject)
+            return unityObject != null;
+
+        return rules != null;
+    }
 
 
     /// <summary>Updates the sheep's placement animation.</summary>
