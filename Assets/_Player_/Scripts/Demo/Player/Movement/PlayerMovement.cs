@@ -12,8 +12,6 @@ using UnityEngine;
 // can call and use it as-is, without altering (breaking) its behavior.
 public sealed class PlayerMovement : MonoBehaviour
 {
-    // Player states that can be accessed by anyone, basically 0 = Grounded,
-    // 1 = Airborne... but they have pretty names that we can recognise.
     public enum LocomotionState
     {
         Grounded,
@@ -85,7 +83,8 @@ public sealed class PlayerMovement : MonoBehaviour
 
         // Sets responsivness based on what the player is doing.
         float acceleration = airAcceleration;
-        if (wasGrounded) acceleration = hasMoveInput ? groundAcceleration : groundBraking;
+        if (wasGrounded) 
+            acceleration = hasMoveInput ? groundAcceleration : groundBraking;
 
         // This just adds smoothness to transitions between speeds
         planarVelocity = Vector3.MoveTowards(planarVelocity, direction * walkSpeed, acceleration * deltaTime);
@@ -105,9 +104,11 @@ public sealed class PlayerMovement : MonoBehaviour
         CollisionFlags collisions = controller.Move(displacement);
 
         // Something above will stop, and below will signal a landing.
-        if (verticalDistance > 0f && (collisions & CollisionFlags.Above) != 0) verticalVelocity = 0f;
+        if (verticalDistance > 0f && (collisions & CollisionFlags.Above) != 0)
+            verticalVelocity = 0f;
         bool grounded = verticalDistance <= 0f && (collisions & CollisionFlags.Below) != 0;
-        if (grounded) verticalVelocity = GroundContactSpeed;
+        if (grounded) 
+            verticalVelocity = GroundContactSpeed;
 
         // Report actual speed after collisions so animation can stop.
         // i.e our player won't keep running at a wall like a dumb dumb.
