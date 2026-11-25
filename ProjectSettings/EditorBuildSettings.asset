@@ -6,9 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_HUD/DemoScene01/SheepInventory.unity
+    guid: 24d2a4f07875fa64ca2275dd5a6d1a61
+  - enabled: 0
     path: Assets/_Menus/Scenes/MainMenu.unity
     guid: 8805761cb4a74a745a054b162dccf101
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Level/Scenes/MainLevel.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
