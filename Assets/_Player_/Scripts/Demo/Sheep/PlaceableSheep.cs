@@ -148,6 +148,9 @@ public sealed class PlaceableSheep : MonoBehaviour
 
 
 
+    /// <summary>Checks if the surface rule provider is valid.</summary>
+    /// <param name="rules">The rule provider to validate.</param>
+    /// <returns>True if the provider exists and is not destroyed.</returns>
     private static bool IsRuleAvailable(ISheepSurfaceRules rules)
     {
         // Interface reference can outlive its unity component, so it 
@@ -157,6 +160,7 @@ public sealed class PlaceableSheep : MonoBehaviour
 
         return rules != null;
     }
+
 
 
     /// <summary>Updates the sheep's placement animation.</summary>
